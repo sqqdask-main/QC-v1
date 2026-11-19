@@ -3,168 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>ARENA</title>
+<title>ARENA — Minecraft Live</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 :root{
   --bg0:#05070d;--bg1:#0d1220;--bg2:#1a2033;
-  --primary:#00e5ff;--primary-dim:#00b8cc;--secondary:#a855f7;
+  --primary:#00e5ff;--secondary:#a855f7;
   --danger:#ef4444;--warn:#f59e0b;--success:#10b981;
   --text:#e2e8f0;--text-dim:#94a3b8;
-  --border:rgba(0,229,255,0.2);--glass:rgba(13,18,32,0.85);
+  --border:rgba(0,229,255,0.25);
+  --glass:rgba(13,18,32,0.72);
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
 button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
-input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+input,select{font-family:inherit;font-size:inherit;color:inherit;outline:none}
 
-.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;overflow:hidden}
 .screen.active{display:flex}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
 .overlay.active{display:flex}
 
 /* Loading */
 #loading{background:radial-gradient(circle at center,#0d1220,#05070d);gap:20px}
 .spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loading .label{color:var(--text-dim);font-size:14px}
+#loading .label{color:var(--text-dim);font-size:14px;letter-spacing:.1em}
 
-/* Main menu */
-#mainMenu{background:radial-gradient(ellipse at 50% 40%,#0d1a2e 0%,#05070d 70%);overflow:hidden}
-#mainMenu::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.06) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);pointer-events:none}
-.menu-title{font-size:clamp(38px,9vw,72px);font-weight:900;letter-spacing:0.15em;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 40px rgba(0,229,255,0.4);margin-bottom:8px;position:relative;z-index:1}
-.menu-subtitle{color:var(--text-dim);letter-spacing:0.3em;font-size:12px;margin-bottom:48px;position:relative;z-index:1}
-.menu-buttons{display:flex;flex-direction:column;gap:14px;width:min(320px,85vw);position:relative;z-index:1}
-.menu-btn{padding:16px 24px;background:var(--glass);border:1px solid var(--border);border-radius:14px;font-size:16px;font-weight:600;letter-spacing:0.05em;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(10px)}
-.menu-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(168,85,247,0.15));opacity:0;transition:opacity 0.25s;z-index:-1}
-.menu-btn:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 8px 24px rgba(0,229,255,0.2)}
+/* Main Menu with 3D Preview */
+#mainMenu{display:none;background:#000}
+#mainMenu.active{display:block}
+#previewCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+.menu-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse at center,rgba(5,10,20,0.15) 0%,rgba(5,10,20,0.65) 70%,rgba(5,10,20,0.9) 100%);
+  backdrop-filter:blur(3px)}
+.menu-title{font-size:clamp(48px,12vw,96px);font-weight:900;letter-spacing:.18em;line-height:1;
+  background:linear-gradient(135deg,#00e5ff 0%,#a855f7 50%,#ff00aa 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(0,229,255,0.5));margin-bottom:6px;text-align:center}
+.menu-subtitle{color:rgba(255,255,255,0.7);letter-spacing:.5em;font-size:11px;margin-bottom:36px;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.menu-buttons{display:flex;flex-direction:column;gap:12px;width:min(300px,85vw)}
+.menu-btn{padding:16px 24px;background:rgba(10,20,35,0.75);border:1.5px solid rgba(0,229,255,0.35);border-radius:14px;
+  font-size:16px;font-weight:700;letter-spacing:.06em;transition:all .25s;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(12px);color:#fff;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+.menu-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,0.25),rgba(168,85,247,0.25));opacity:0;transition:opacity .25s;z-index:-1}
+.menu-btn:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 10px 30px rgba(0,229,255,0.3)}
 .menu-btn:hover::before{opacity:1}
-.menu-btn:active{transform:translateY(0) scale(0.98)}
-.menu-btn.danger:hover{border-color:var(--danger);box-shadow:0 8px 24px rgba(239,68,68,0.2)}
-.menu-btn.hidden{display:none}
+.menu-btn:active{transform:translateY(0) scale(.97)}
+.menu-version{position:absolute;bottom:16px;right:20px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.15em;z-index:3}
 
-/* Game */
-#game{padding:0;background:#000}
-#gameCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
-#hud{position:absolute;inset:0;pointer-events:none;z-index:5}
-#hud .touch-btn{pointer-events:auto}
-
-/* Touch buttons */
-.touch-btn{position:absolute;border-radius:50%;background:rgba(13,18,32,0.7);border:2px solid var(--primary);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(8px);transition:transform 0.15s,background 0.15s;pointer-events:auto}
-.touch-btn:active{transform:scale(0.92);background:rgba(0,229,255,0.25)}
-.touch-btn.hidden{display:none}
-
-/* Editor mode */
-.editor-mode .touch-btn{border-color:var(--warn);background:rgba(245,158,11,0.2);cursor:move;pointer-events:auto}
-.editor-mode .touch-btn.selected{border-color:var(--success);box-shadow:0 0 0 3px rgba(16,185,129,0.4);background:rgba(16,185,129,0.25)}
-.editor-mode .touch-btn .resize-handle{position:absolute;bottom:-8px;right:-8px;width:22px;height:22px;background:var(--success);border-radius:50%;border:2px solid white;cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;z-index:2}
-.editor-mode .touch-btn .resize-handle::after{content:'⤡'}
-.editor-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0a1428,#1a0f2e);z-index:40;display:none}
-.editor-overlay.active{display:block}
-.editor-topbar{position:fixed;top:0;left:0;right:0;padding:12px 16px;display:flex;gap:10px;justify-content:space-between;align-items:center;z-index:50;background:linear-gradient(to bottom,rgba(5,7,13,0.9),transparent);pointer-events:none}
-.editor-topbar > *{pointer-events:auto}
-.editor-info{padding:8px 14px;background:rgba(0,229,255,0.1);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text-dim);max-width:60%}
-.editor-bottom{position:fixed;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,7,13,0.95),transparent);display:none;z-index:50;gap:16px;flex-direction:column}
-.editor-bottom.active{display:flex}
-.editor-control{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:8px}
-.editor-control label{font-size:12px;color:var(--text-dim);display:flex;justify-content:space-between;align-items:center}
-.editor-control input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2);outline:none}
-.editor-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 0 8px rgba(0,229,255,0.5)}
-.editor-control input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--primary);cursor:pointer}
-
-/* Buttons generic */
-.btn{padding:12px 20px;background:var(--glass);border:1px solid var(--border);border-radius:10px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(8px)}
-.btn:hover{border-color:var(--primary);background:rgba(0,229,255,0.1)}
-.btn:active{transform:scale(0.97)}
+/* Options */
+#options{background:radial-gradient(ellipse at center,#0d1220,#05070d);overflow-y:auto;padding:20px;display:none}
+#options.active{display:block}
+.options-container{width:min(580px,100%);margin:0 auto;padding:20px 0}
+.options-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;position:sticky;top:0;padding:12px 0;
+  background:linear-gradient(to bottom,rgba(5,7,13,1) 70%,transparent);z-index:2}
+.options-header h2{font-size:22px;background:linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1}
+.option-section{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:12px;backdrop-filter:blur(12px)}
+.option-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:16px;flex-wrap:wrap}
+.option-row:last-child{border-bottom:none}
+.option-label{font-weight:600;font-size:14px}
+.option-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
+.slider-wrap{display:flex;align-items:center;gap:10px;min-width:160px;flex:1;max-width:220px}
+.slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2)}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 0 10px var(--primary)}
+.slider-wrap input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--primary);cursor:pointer}
+.slider-value{font-family:monospace;color:var(--primary);font-size:13px;min-width:50px;text-align:center;font-weight:700}
+.toggle{position:relative;width:52px;height:30px;background:var(--bg2);border-radius:15px;cursor:pointer;transition:background .25s;border:1px solid var(--border);flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;background:var(--text-dim);border-radius:50%;transition:all .25s}
+.toggle.on{background:rgba(0,229,255,0.3);border-color:var(--primary)}
+.toggle.on::after{left:calc(100% - 25px);background:var(--primary);box-shadow:0 0 12px var(--primary)}
+.sel{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;cursor:pointer;min-width:140px}
+.btn{padding:12px 20px;background:var(--glass);border:1px solid var(--border);border-radius:10px;font-weight:600;
+  transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(8px)}
+.btn:hover{border-color:var(--primary);background:rgba(0,229,255,0.12)}
+.btn:active{transform:scale(.97)}
 .btn.primary{background:var(--primary);color:var(--bg0);border-color:var(--primary)}
-.btn.primary:hover{background:var(--primary-dim)}
+.btn.primary:hover{background:var(--primary);filter:brightness(1.15)}
 .btn.danger{border-color:var(--danger);color:var(--danger)}
 .btn.danger:hover{background:rgba(239,68,68,0.15)}
 .btn.warn{border-color:var(--warn);color:var(--warn)}
 .btn.warn:hover{background:rgba(245,158,11,0.15)}
 .btn.small{padding:8px 12px;font-size:13px}
-.btn:disabled{opacity:0.4;cursor:not-allowed}
 
-/* Options */
-#options{background:radial-gradient(ellipse at center,#0d1220,#05070d);overflow-y:auto;padding:20px;display:none}
-#options.active{display:block}
-.options-container{width:min(560px,100%);margin:0 auto;padding:24px 0}
-.options-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;position:sticky;top:0;padding:12px 0;background:linear-gradient(to bottom,#05070d 60%,transparent);z-index:2}
-.options-header h2{font-size:24px;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.options-header .spacer{flex:1}
-.option-section{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;backdrop-filter:blur(10px)}
-.option-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:16px;flex-wrap:wrap}
-.option-row:last-child{border-bottom:none}
-.option-label{font-weight:600;font-size:15px}
-.option-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
-.slider-wrap{display:flex;align-items:center;gap:10px;min-width:160px;flex:1;max-width:200px}
-.slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2);outline:none}
-.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 0 8px rgba(0,229,255,0.5)}
-.slider-wrap input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--primary);cursor:pointer}
-.slider-value{font-family:monospace;color:var(--primary);font-size:13px;min-width:44px;text-align:center}
+/* Touch Editor */
+.editor-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0a1428,#1a0f2e);z-index:40;display:none}
+.editor-overlay.active{display:block}
+.editor-topbar{position:fixed;top:0;left:0;right:0;padding:12px 16px;display:none;gap:10px;justify-content:space-between;
+  align-items:center;z-index:50;background:linear-gradient(to bottom,rgba(5,7,13,0.95),transparent);pointer-events:none}
+.editor-topbar.active{display:flex}
+.editor-topbar > *{pointer-events:auto}
+.editor-info{padding:8px 14px;background:rgba(0,229,255,0.15);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text-dim);max-width:50%}
+.editor-bottom{position:fixed;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,7,13,0.95),transparent);
+  display:none;z-index:50;gap:12px;flex-direction:column}
+.editor-bottom.active{display:flex}
+.editor-control{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:8px}
+.editor-control label{font-size:12px;color:var(--text-dim);display:flex;justify-content:space-between}
+.editor-control input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2)}
+.editor-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px var(--primary)}
+.editor-control input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--primary)}
 
-/* Toggle */
-.toggle{position:relative;width:52px;height:30px;background:var(--bg2);border-radius:15px;cursor:pointer;transition:background 0.25s;border:1px solid var(--border);flex-shrink:0}
-.toggle::after{content:'';position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;background:var(--text-dim);border-radius:50%;transition:all 0.25s}
-.toggle.on{background:rgba(0,229,255,0.25);border-color:var(--primary)}
-.toggle.on::after{left:calc(100% - 25px);background:var(--primary);box-shadow:0 0 12px var(--primary)}
+/* Game */
+#game{padding:0;background:#000;display:none}
+#game.active{display:block}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+#hud{position:absolute;inset:0;pointer-events:none;z-index:5}
+#hudInfo{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px}
+.hud-badge{padding:6px 12px;background:rgba(13,18,32,0.75);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text-dim);backdrop-filter:blur(8px)}
+.hud-badge strong{color:var(--primary)}
 
-/* Select */
-.sel{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;cursor:pointer;min-width:140px}
-.sel:focus{border-color:var(--primary)}
+/* Touch buttons */
+.touch-btn{position:absolute;border-radius:50%;background:rgba(13,18,32,0.7);border:2px solid var(--primary);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(8px);transition:transform .15s;pointer-events:auto}
+.touch-btn:active{transform:scale(.92);background:rgba(0,229,255,0.3)}
+body.editor-mode .touch-btn{border-color:var(--warn);background:rgba(245,158,11,0.2);cursor:move}
+body.editor-mode .touch-btn.selected{border-color:var(--success);box-shadow:0 0 0 3px rgba(16,185,129,0.4);background:rgba(16,185,129,0.3)}
+body.editor-mode .touch-btn .resize-handle{position:absolute;bottom:-8px;right:-8px;width:22px;height:22px;background:var(--success);
+  border-radius:50%;border:2px solid white;cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;color:white}
+
+/* Chat */
+#chatPanel{position:fixed;right:0;bottom:0;width:min(360px,100vw);max-height:60vh;height:60vh;background:var(--glass);
+  border-top-left-radius:16px;border:1px solid var(--border);z-index:30;display:none;flex-direction:column;backdrop-filter:blur(20px)}
+#chatPanel.open{display:flex}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{background:rgba(255,255,255,0.05);border-radius:10px;padding:8px 12px;max-width:85%;align-self:flex-start;font-size:13px}
+.chat-msg.me{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.35);align-self:flex-end}
+.chat-msg .author{font-weight:700;color:var(--primary);font-size:12px;margin-bottom:2px}
+.chat-msg .time{font-size:10px;color:var(--text-dim);margin-top:2px}
+.chat-empty{color:var(--text-dim);text-align:center;padding:20px;font-size:13px}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.chat-input-row input{flex:1;padding:10px 14px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--text)}
+.chat-input-row input:focus{border-color:var(--primary)}
+.chat-input-row button{padding:10px 18px;background:var(--primary);color:var(--bg0);border-radius:10px;font-weight:700;font-size:14px}
+
+/* Admin Lock Screen */
+#adminLock{background:radial-gradient(ellipse at center,#1a0f2e,#05070d);display:none;padding:20px}
+#adminLock.active{display:flex}
+.lock-container{width:min(340px,100%);background:var(--glass);border:1.5px solid var(--danger);border-radius:24px;padding:28px 24px;
+  backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(239,68,68,0.3),0 0 40px rgba(239,68,68,0.15);position:relative}
+.lock-icon{font-size:44px;text-align:center;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(239,68,68,0.6))}
+.lock-container h2{text-align:center;font-size:20px;margin-bottom:4px;color:var(--danger);font-weight:800;letter-spacing:.05em}
+.lock-container .lock-sub{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:20px}
+.pin-display{display:flex;justify-content:center;gap:12px;margin-bottom:24px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(239,68,68,0.5);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--danger);border-color:var(--danger);box-shadow:0 0 12px var(--danger)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.pin-display.shake{animation:shake .4s}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pin-pad button{aspect-ratio:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;font-size:22px;
+  font-weight:700;color:var(--text);transition:all .12s;display:flex;align-items:center;justify-content:center}
+.pin-pad button:active{background:var(--danger);color:white;transform:scale(.94)}
+.pin-pad button.fn{font-size:16px;color:var(--text-dim);background:rgba(255,255,255,0.04)}
+.lock-exit-btn{width:100%;padding:14px;background:rgba(239,68,68,0.15);border:1.5px solid var(--danger);border-radius:14px;
+  color:var(--danger);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.lock-exit-btn:active{background:rgba(239,68,68,0.3)}
+.lock-exit-btn .exit-pin{font-family:monospace;font-size:14px;padding:3px 10px;background:rgba(239,68,68,0.25);border-radius:6px;
+  letter-spacing:.2em;color:#fff;font-weight:800}
+.lock-error{text-align:center;color:var(--danger);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
 
 /* Operator */
 #operator{background:radial-gradient(ellipse at center,#1a0f2e,#05070d);overflow-y:auto;padding:20px;display:none}
 #operator.active{display:block}
-.op-container{width:min(720px,100%);margin:0 auto;padding:24px 0}
-.op-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.op-header h2{font-size:24px;background:linear-gradient(135deg,var(--warn),var(--danger));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.op-note{padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:13px;color:var(--warn);margin-bottom:20px}
-.op-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.op-tab{padding:10px 18px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:14px;transition:all 0.2s}
+.op-container{width:min(720px,100%);margin:0 auto;padding:20px 0}
+.op-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.op-header h2{font-size:22px;background:linear-gradient(135deg,var(--warn),var(--danger));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1}
+.admin-badge{padding:6px 12px;background:rgba(16,185,129,0.2);border:1px solid var(--success);border-radius:20px;
+  font-size:12px;color:var(--success);font-weight:700}
+.op-note{padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:13px;color:var(--warn);margin-bottom:16px}
+.op-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.op-tab{padding:10px 18px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:14px;transition:all .2s}
 .op-tab.active{background:var(--primary);color:var(--bg0);border-color:var(--primary)}
 .op-panel{display:none}
 .op-panel.active{display:block}
-.player-row,.msg-row{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px);flex-wrap:wrap}
-.player-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bg0);flex-shrink:0}
+.player-row,.msg-row{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;
+  display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px);flex-wrap:wrap}
+.player-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--bg0);flex-shrink:0}
 .player-info{flex:1;min-width:120px}
-.player-name{font-weight:600}
+.player-name{font-weight:700}
 .player-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}
 .player-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success)}
 .player-actions{display:flex;gap:6px;flex-wrap:wrap}
 .msg-content{flex:1;min-width:200px}
-.msg-author{font-weight:600;color:var(--primary);font-size:13px}
+.msg-author{font-weight:700;color:var(--primary);font-size:13px}
 .msg-text{font-size:14px;margin-top:2px;word-wrap:break-word}
 .msg-time{font-size:11px;color:var(--text-dim);margin-top:2px}
 
-/* Chat */
-#chatPanel{position:fixed;right:0;bottom:0;width:min(360px,100vw);max-height:60vh;height:60vh;background:var(--glass);border-top-left-radius:16px;border:1px solid var(--border);z-index:30;display:none;flex-direction:column;backdrop-filter:blur(20px);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}
-#chatPanel.open{display:flex;transform:translateY(0)}
-html[dir=rtl] #chatPanel{right:0;left:auto;border-top-left-radius:16px;border-top-right-radius:0}
-.chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600;flex-shrink:0}
-.chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.chat-msg{background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 12px;max-width:85%;align-self:flex-start;font-size:13px;position:relative;word-wrap:break-word}
-.chat-msg.me{background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.3);align-self:flex-end}
-.chat-msg .author{font-weight:600;color:var(--primary);font-size:12px;margin-bottom:2px}
-.chat-msg .time{font-size:10px;color:var(--text-dim);margin-top:2px}
-.chat-msg .del-btn{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:white;font-size:12px;display:none;align-items:center;justify-content:center}
-.chat-msg:hover .del-btn,.chat-msg:active .del-btn{display:flex}
-.chat-empty{color:var(--text-dim);text-align:center;padding:20px;font-size:13px}
-.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);flex-shrink:0}
-.chat-input-row input{flex:1;padding:10px 14px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;outline:none;font-size:14px;color:var(--text)}
-.chat-input-row input:focus{border-color:var(--primary)}
-.chat-input-row button{padding:10px 18px;background:var(--primary);color:var(--bg0);border-radius:10px;font-weight:600;font-size:14px}
-
-/* HUD info */
-#hudInfo{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.hud-badge{padding:6px 12px;background:rgba(13,18,32,0.75);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text-dim);backdrop-filter:blur(8px)}
-.hud-badge strong{color:var(--primary)}
-
 /* Dialog */
-.dialog{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.dialog{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
 .dialog h3{font-size:18px;margin-bottom:12px}
-.dialog p{color:var(--text-dim);font-size:14px;margin-bottom:20px;line-height:1.5}
-.dialog input[type=text],.dialog input[type=number],.dialog textarea{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;outline:none;color:var(--text);font-size:14px;margin-bottom:12px;resize:none}
-.dialog input:focus,.dialog textarea:focus{border-color:var(--primary)}
+.dialog p{color:var(--text-dim);font-size:14px;margin-bottom:16px;line-height:1.5}
+.dialog input,.dialog textarea{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;margin-bottom:12px}
+.dialog input:focus{border-color:var(--primary)}
 .dialog-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 
 /* Ban screen */
@@ -175,29 +208,28 @@ html[dir=rtl] #chatPanel{right:0;left:auto;border-top-left-radius:16px;border-to
 #banScreen .ban-info .row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.05)}
 #banScreen .ban-info .row:last-child{border-bottom:none}
 #banScreen .ban-info .row span:first-child{color:var(--text-dim)}
-#banScreen .countdown{font-family:monospace;font-size:20px;color:var(--danger)}
+#banScreen .countdown{font-family:monospace;font-size:20px;color:var(--danger);font-weight:700}
 
-/* Toast */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 20px;z-index:500;font-size:14px;opacity:0;transition:all 0.3s;backdrop-filter:blur(10px);pointer-events:none;max-width:90vw}
+/* Toast & Conn */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--glass);
+  border:1px solid var(--border);border-radius:12px;padding:12px 20px;z-index:500;font-size:14px;opacity:0;
+  transition:all .3s;backdrop-filter:blur(10px);pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #toast.error{border-color:var(--danger);color:var(--danger)}
 #toast.success{border-color:var(--success);color:var(--success)}
 #toast.warn{border-color:var(--warn);color:var(--warn)}
-
-/* Connection status */
-#connStatus{position:fixed;top:12px;right:12px;padding:6px 12px;background:rgba(13,18,32,0.9);border:1px solid var(--border);border-radius:20px;font-size:11px;z-index:90;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)}
+#connStatus{position:fixed;top:12px;left:12px;padding:6px 12px;background:rgba(13,18,32,0.9);border:1px solid var(--border);
+  border-radius:20px;font-size:11px;z-index:90;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)}
 #connStatus::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn)}
 #connStatus.online::before{background:var(--success);box-shadow:0 0 6px var(--success)}
 #connStatus.offline::before{background:var(--danger);box-shadow:0 0 6px var(--danger)}
-html[dir=rtl] #connStatus{right:auto;left:12px}
 
-@media (max-width:600px){
-  .menu-title{letter-spacing:0.1em}
-  .menu-buttons{gap:12px}
-  .menu-btn{padding:14px 20px}
-  .player-row,.msg-row{padding:12px;gap:8px}
-  .op-container{padding:16px 0}
-  .editor-bottom{padding:12px}
+@media(max-width:600px){
+  .menu-title{letter-spacing:.1em}
+  .menu-btn{padding:14px 20px;font-size:15px}
+  .op-container{padding:14px 0}
+  .lock-container{padding:22px 18px}
+  .pin-pad button{font-size:20px}
 }
 </style>
 </head>
@@ -205,13 +237,11 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
 
 <div id="connStatus">جاري الاتصال...</div>
 
-<!-- Loading -->
 <div id="loading" class="screen active">
   <div class="spinner"></div>
   <div class="label">جاري التحميل...</div>
 </div>
 
-<!-- Username -->
 <div id="usernameScreen" class="screen">
   <div class="dialog" style="max-width:400px">
     <h3 id="uTitle">اسم اللاعب</h3>
@@ -223,93 +253,67 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
 </div>
 
-<!-- Main Menu -->
+<!-- MAIN MENU WITH 3D PREVIEW -->
 <div id="mainMenu" class="screen">
-  <div class="menu-title">ARENA</div>
-  <div class="menu-subtitle">NEON COMBAT ZONE</div>
-  <div class="menu-buttons">
-    <button class="menu-btn" data-action="single" id="btnSingle">🎮 <span data-i18n="single">لاعب واحد</span></button>
-    <button class="menu-btn" data-action="live" id="btnLive">🌐 <span data-i18n="live">انضمام مباشر</span></button>
-    <button class="menu-btn" data-action="options">⚙️ <span data-i18n="options">الإعدادات</span></button>
-    <button class="menu-btn" data-action="operator" id="btnOperator">🛡️ <span data-i18n="operator">قائمة المشرف</span></button>
+  <canvas id="previewCanvas"></canvas>
+  <div class="menu-content">
+    <div class="menu-title">ARENA</div>
+    <div class="menu-subtitle">MINECRAFT · LIVE</div>
+    <div class="menu-buttons">
+      <button class="menu-btn" data-action="single">🎮 <span data-i18n="single">لاعب واحد</span></button>
+      <button class="menu-btn" data-action="live">🌐 <span data-i18n="live">انضمام مباشر</span></button>
+      <button class="menu-btn" data-action="options">⚙️ <span data-i18n="options">الإعدادات</span></button>
+      <button class="menu-btn" data-action="operator">🛡️ <span data-i18n="operator">قائمة المشرف</span></button>
+    </div>
   </div>
+  <div class="menu-version">v2.0 · MINECRAFT EDITION</div>
 </div>
 
-<!-- Options -->
+<!-- OPTIONS -->
 <div id="options" class="screen">
   <div class="options-container">
     <div class="options-header">
       <button class="btn small" id="optBack">← <span data-i18n="back">رجوع</span></button>
       <h2 data-i18n="options">الإعدادات</h2>
-      <div class="spacer"></div>
       <button class="btn small danger" id="optReset"><span data-i18n="reset">إعادة تعيين</span></button>
     </div>
-
     <div class="option-section">
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="language">اللغة</div>
-          <div class="option-desc">Language / اللغة</div>
-        </div>
+        <div><div class="option-label" data-i18n="language">اللغة</div><div class="option-desc">Language</div></div>
         <select class="sel" id="optLang">
           <option value="ar">العربية</option>
           <option value="en">English</option>
         </select>
       </div>
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="pov">زاوية الرؤية (POV)</div>
-          <div class="option-desc">FOV</div>
-        </div>
-        <div class="slider-wrap">
-          <input type="range" id="optPov" min="60" max="110" step="1">
-          <span class="slider-value" id="optPovVal">75</span>
-        </div>
+        <div><div class="option-label" data-i18n="pov">زاوية الرؤية (POV)</div><div class="option-desc">Field of View</div></div>
+        <div class="slider-wrap"><input type="range" id="optPov" min="60" max="110" step="1"><span class="slider-value" id="optPovVal">75</span></div>
       </div>
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="gyro">الجيروسكوب</div>
-          <div class="option-desc">Gyroscope</div>
-        </div>
-        <div class="toggle" id="optGyro" role="switch"></div>
+        <div><div class="option-label" data-i18n="gyro">الجيروسكوب</div><div class="option-desc">Gyroscope</div></div>
+        <div class="toggle" id="optGyro"></div>
       </div>
     </div>
-
     <div class="option-section">
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="camSpeedPC">سرعة الكاميرا - كمبيوتر</div>
-          <div class="option-desc">Camera Speed (PC)</div>
-        </div>
-        <div class="slider-wrap">
-          <input type="range" id="optCamPC" min="0.2" max="3" step="0.1">
-          <span class="slider-value" id="optCamPCVal">1.0x</span>
-        </div>
+        <div><div class="option-label" data-i18n="camSpeedPC">سرعة الكاميرا - كمبيوتر</div><div class="option-desc">Camera Speed (PC)</div></div>
+        <div class="slider-wrap"><input type="range" id="optCamPC" min="0.2" max="3" step="0.1"><span class="slider-value" id="optCamPCVal">1.0x</span></div>
       </div>
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="camSpeedMobile">سرعة الكاميرا - جوال</div>
-          <div class="option-desc">Camera Speed (Mobile)</div>
-        </div>
-        <div class="slider-wrap">
-          <input type="range" id="optCamMobile" min="0.2" max="3" step="0.1">
-          <span class="slider-value" id="optCamMobileVal">1.0x</span>
-        </div>
+        <div><div class="option-label" data-i18n="camSpeedMobile">سرعة الكاميرا - جوال</div><div class="option-desc">Camera Speed (Mobile)</div></div>
+        <div class="slider-wrap"><input type="range" id="optCamMobile" min="0.2" max="3" step="0.1"><span class="slider-value" id="optCamMobileVal">1.0x</span></div>
       </div>
       <div class="option-row">
-        <div>
-          <div class="option-label" data-i18n="editTouchMenu">تعديل قائمة اللمس</div>
-          <div class="option-desc">Edit Touch Menu</div>
-        </div>
+        <div><div class="option-label" data-i18n="editTouchMenu">تعديل قائمة اللمس</div><div class="option-desc">Edit Touch Menu</div></div>
         <button class="btn primary" id="optEditTouch">تعديل</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Touch Editor -->
+<!-- TOUCH EDITOR -->
 <div class="editor-overlay" id="editorOverlay"></div>
-<div class="editor-topbar" id="editorTopbar" style="display:none">
+<div class="editor-topbar" id="editorTopbar">
   <button class="btn small" id="edBack">← <span data-i18n="backToOptions">رجوع للإعدادات</span></button>
   <div class="editor-info" id="edInfo">اختر زراً لتعديله</div>
   <button class="btn small danger" id="edReset"><span data-i18n="reset">إعادة تعيين</span></button>
@@ -325,7 +329,7 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
 </div>
 
-<!-- Game -->
+<!-- GAME -->
 <div id="game" class="screen">
   <canvas id="gameCanvas"></canvas>
   <div id="hud">
@@ -338,7 +342,7 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
 </div>
 
-<!-- Chat -->
+<!-- CHAT -->
 <div id="chatPanel">
   <div class="chat-header">
     <span data-i18n="chat">الدردشة</span>
@@ -346,19 +350,55 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" maxlength="200" data-i18n-placeholder="chatPlaceholder" placeholder="اكتب رسالة...">
+    <input type="text" id="chatInput" maxlength="200" placeholder="اكتب رسالة...">
     <button id="chatSend" data-i18n="send">إرسال</button>
   </div>
 </div>
 
-<!-- Operator -->
+<!-- ADMIN LOCK -->
+<div id="adminLock" class="screen">
+  <div class="lock-container">
+    <div class="lock-icon">🔒</div>
+    <h2 data-i18n="adminLock">قفل المشرف</h2>
+    <div class="lock-sub" data-i18n="adminLockSub">أدخل رمز الحماية</div>
+    <div class="pin-display" id="pinDisplay">
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin-pad">
+      <button data-pin="1">1</button>
+      <button data-pin="2">2</button>
+      <button data-pin="3">3</button>
+      <button data-pin="4">4</button>
+      <button data-pin="5">5</button>
+      <button data-pin="6">6</button>
+      <button data-pin="7">7</button>
+      <button data-pin="8">8</button>
+      <button data-pin="9">9</button>
+      <button data-pin="clear" class="fn">✕</button>
+      <button data-pin="0">0</button>
+      <button data-pin="back" class="fn">⌫</button>
+    </div>
+    <button class="lock-exit-btn" id="lockExit">
+      <span data-i18n="exit">خروج</span>
+      <span class="exit-pin">19132</span>
+    </button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<!-- OPERATOR -->
 <div id="operator" class="screen">
   <div class="op-container">
     <div class="op-header">
       <button class="btn small" id="opBack">← <span data-i18n="back">رجوع</span></button>
       <h2 data-i18n="operator">قائمة المشرف</h2>
+      <div class="admin-badge" id="opAdminBadge">ADMIN</div>
     </div>
-    <div class="op-note" data-i18n="opNote">وضع تجريبي - يمكنك تجربة كل الميزات</div>
+    <div class="op-note" data-i18n="opNote">وضع تجريبي - كل الميزات متاحة</div>
     <div class="op-tabs">
       <button class="op-tab active" data-opTab="players" data-i18n="players">اللاعبون</button>
       <button class="op-tab" data-opTab="messages" data-i18n="chat">الدردشة</button>
@@ -368,7 +408,7 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
 </div>
 
-<!-- Confirm dialog -->
+<!-- CONFIRM DIALOG -->
 <div class="overlay" id="confirmOverlay">
   <div class="dialog">
     <h3 id="confirmTitle">تأكيد</h3>
@@ -381,14 +421,13 @@ html[dir=rtl] #connStatus{right:auto;left:12px}
   </div>
 </div>
 
-<!-- Ban screen -->
+<!-- BAN SCREEN -->
 <div id="banScreen" class="screen">
   <h1 data-i18n="youAreBanned">أنت محظور</h1>
   <div class="ban-info" id="banInfo"></div>
   <button class="btn" id="banExit">خروج</button>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <script type="importmap">
@@ -407,158 +446,119 @@ import { createClient } from '@supabase/supabase-js';
 /* ============ CONFIG ============ */
 const SUPABASE_URL = 'https://ketdxtnyxxhjejbicbdv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JAqBDsF961c8tTopO_CLnQ_KVB7ZjSm';
+const ADMIN_USERNAME = 'sqqdask';
+const ADMIN_PIN = '19132';
 
 /* ============ I18N ============ */
 const LANGS = {
-  ar: {
-    dir:'rtl', title:'ARENA',
+  ar: { dir:'rtl',
     single:'لاعب واحد', live:'انضمام مباشر', options:'الإعدادات', operator:'قائمة المشرف',
-    username:'اسم اللاعب', enterName:'أدخل اسمك', continue:'متابعة', back:'رجوع',
+    username:'اسم اللاعب', enterName:'أدخل اسمك للبدء', continue:'متابعة', back:'رجوع',
     backToOptions:'رجوع للإعدادات', reset:'إعادة تعيين',
     resetConfirm:'هل أنت متأكد من إعادة تعيين كل الإعدادات؟', resetConfirmBtn:'نعم، أعد التعيين',
     cancel:'إلغاء', pov:'زاوية الرؤية (POV)', gyro:'الجيروسكوب', language:'اللغة',
     camSpeedPC:'سرعة الكاميرا - كمبيوتر', camSpeedMobile:'سرعة الكاميرا - جوال',
     editTouchMenu:'تعديل قائمة اللمس', touchOpacity:'الشفافية', touchSize:'الحجم',
-    done:'تم', chat:'الدردشة', send:'إرسال', chatPlaceholder:'اكتب رسالة...',
-    players:'اللاعبون', online:'متصل', ban:'حظر', warn:'تحذير', delete:'حذف',
-    banDuration:'مدة الحظر (دقيقة)', reason:'السبب', youAreBanned:'أنت محظور',
-    bannedUntil:'محظور حتى', exit:'خروج', noMessages:'لا توجد رسائل بعد',
-    opNote:'وضع تجريبي - يمكنك تجربة كل الميزات', singleMode:'لاعب واحد - بدون دردشة',
-    confirmDelete:'حذف هذه الرسالة؟', confirmBan:'حظر هذا اللاعب؟',
-    confirmWarn:'تحذير هذا اللاعب؟', unknown:'غير معروف', editTouch:'تعديل',
-    selectButton:'اختر زراً لتعديله', player:'لاعب', you:'أنت', chatOnlyLive:'الدردشة متاحة فقط في الانضمام المباشر',
-    banned:'تم الحظر', warned:'تم التحذير', deleted:'تم الحذف', messageSent:'تم الإرسال',
-    enterName2:'الرجاء إدخال اسمك', backToMenu:'القائمة الرئيسية', resume:'متابعة',
-    connecting:'جاري الاتصال...', online2:'متصل', offline:'محلي', testMode:'وضع تجريبي',
-    banSuccess:'تم حظر اللاعب', warnSuccess:'تم تحذير اللاعب', deleteSuccess:'تم حذف الرسالة',
-    needUsername:'أدخل اسماً أولاً', noPlayers:'لا يوجد لاعبون', playerJoined:'انضم', playerLeft:'غادر'
+    chat:'الدردشة', send:'إرسال', players:'اللاعبون', online:'متصل',
+    ban:'حظر', warn:'تحذير', delete:'حذف', banDuration:'مدة الحظر (دقيقة)', reason:'السبب',
+    youAreBanned:'أنت محظور', bannedUntil:'محظور حتى', exit:'خروج',
+    noMessages:'لا توجد رسائل بعد', opNote:'وضع تجريبي - كل الميزات متاحة',
+    singleMode:'لاعب واحد - بدون دردشة', confirmDelete:'حذف هذه الرسالة؟', confirmBan:'حظر هذا اللاعب؟',
+    confirmWarn:'تحذير هذا اللاعب؟', selectButton:'اختر زراً لتعديله', you:'أنت',
+    chatOnlyLive:'الدردشة متاحة فقط في الانضمام المباشر', chatPlaceholder:'اكتب رسالة...',
+    banned:'تم الحظر', warned:'تم التحذير', deleted:'تم الحذف', enterName2:'الرجاء إدخال اسمك',
+    backToMenu:'القائمة الرئيسية', resume:'متابعة', pause:'إيقاف مؤقت',
+    connecting:'جاري الاتصال...', online2:'متصل', testMode:'وضع تجريبي',
+    adminLock:'قفل المشرف', adminLockSub:'أدخل رمز الحماية', adminOnly:'للمشرف فقط',
+    wrongPin:'رمز خاطئ', accessDenied:'هذه المنطقة محمية'
   },
-  en: {
-    dir:'ltr', title:'ARENA',
+  en: { dir:'ltr',
     single:'Single Player', live:'Live Join', options:'Options', operator:'Operator',
     username:'Username', enterName:'Enter your name', continue:'Continue', back:'Back',
     backToOptions:'Back to Options', reset:'Reset',
-    resetConfirm:'Are you sure you want to reset all settings?', resetConfirmBtn:'Yes, reset',
-    cancel:'Cancel', pov:'Field of View (POV)', gyro:'Gyroscope', language:'Language',
+    resetConfirm:'Reset all settings?', resetConfirmBtn:'Yes, reset',
+    cancel:'Cancel', pov:'Field of View', gyro:'Gyroscope', language:'Language',
     camSpeedPC:'Camera Speed - PC', camSpeedMobile:'Camera Speed - Mobile',
     editTouchMenu:'Edit Touch Menu', touchOpacity:'Opacity', touchSize:'Size',
-    done:'Done', chat:'Chat', send:'Send', chatPlaceholder:'Type a message...',
-    players:'Players', online:'Online', ban:'Ban', warn:'Warn', delete:'Delete',
-    banDuration:'Ban Duration (min)', reason:'Reason', youAreBanned:'You are banned',
-    bannedUntil:'Banned until', exit:'Exit', noMessages:'No messages yet',
-    opNote:'Test mode - you can try all features', singleMode:'Single Player - no chat',
-    confirmDelete:'Delete this message?', confirmBan:'Ban this player?',
-    confirmWarn:'Warn this player?', unknown:'Unknown', editTouch:'Edit',
-    selectButton:'Select a button to edit', player:'Player', you:'You', chatOnlyLive:'Chat is only available in Live Join',
-    banned:'Banned', warned:'Warned', deleted:'Deleted', messageSent:'Sent',
-    enterName2:'Please enter your name', backToMenu:'Main Menu', resume:'Resume',
-    connecting:'Connecting...', online2:'Online', offline:'Local', testMode:'Test Mode',
-    banSuccess:'Player banned', warnSuccess:'Player warned', deleteSuccess:'Message deleted',
-    needUsername:'Enter a name first', noPlayers:'No players', playerJoined:'joined', playerLeft:'left'
+    chat:'Chat', send:'Send', players:'Players', online:'Online',
+    ban:'Ban', warn:'Warn', delete:'Delete', banDuration:'Ban Duration (min)', reason:'Reason',
+    youAreBanned:'You are banned', bannedUntil:'Banned until', exit:'Exit',
+    noMessages:'No messages yet', opNote:'Test mode - all features available',
+    singleMode:'Single Player - no chat', confirmDelete:'Delete this message?', confirmBan:'Ban this player?',
+    confirmWarn:'Warn this player?', selectButton:'Select a button to edit', you:'You',
+    chatOnlyLive:'Chat is only available in Live Join', chatPlaceholder:'Type a message...',
+    banned:'Banned', warned:'Warned', deleted:'Deleted', enterName2:'Please enter your name',
+    backToMenu:'Main Menu', resume:'Resume', pause:'Paused',
+    connecting:'Connecting...', online2:'Online', testMode:'Test Mode',
+    adminLock:'Admin Lock', adminLockSub:'Enter protection code', adminOnly:'Admin only',
+    wrongPin:'Wrong code', accessDenied:'Protected area'
   }
 };
 let T = LANGS.ar;
-function t(k){ return T[k] || k; }
+const t = k => T[k] || k;
 
 /* ============ STATE ============ */
 const DEFAULT_SETTINGS = { lang:'ar', pov:75, gyro:false, camSpeedPC:1, camSpeedMobile:1, touchButtons:null, username:'' };
 let settings = loadSettings();
 let session = {
   userId:null, username:'', mode:null, supabase:null, channel:null,
-  players:new Map(), messages:[], isOperator:false, online:false,
-  isBanned:false, banInfo:null, scene:null, camera:null, renderer:null,
-  yaw:0, pitch:0, keys:{}, animId:null, canvas:null, dragging:false,
-  lastX:0, lastY:0, botTimers:[], editorSelection:null, editingButton:null,
-  touchButtons:{}, deviceOrientationHandler:null
+  players:new Map(), messages:[], isAdmin:false, isOperator:false, online:false,
+  camera:null, renderer:null, scene:null, yaw:0, pitch:0, keys:{}, animId:null,
+  dragging:false, lastX:0, lastY:0, botTimers:[], editorSelection:null,
+  deviceOrientationHandler:null, previewRenderer:null, previewScene:null,
+  previewCamera:null, previewAnimId:null, previewActive:false,
+  pinInput:'', banInfo:null
 };
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
 
-function loadSettings(){
-  try{ const r = localStorage.getItem('arena_settings'); if(r) return {...DEFAULT_SETTINGS, ...JSON.parse(r)}; }catch(e){}
-  return {...DEFAULT_SETTINGS};
-}
+/* ============ UTILITIES ============ */
+function loadSettings(){ try{ const r=localStorage.getItem('arena_settings'); return r?{...DEFAULT_SETTINGS,...JSON.parse(r)}:{...DEFAULT_SETTINGS}; }catch(e){ return {...DEFAULT_SETTINGS}; } }
 function saveSettings(){ try{ localStorage.setItem('arena_settings', JSON.stringify(settings)); }catch(e){} }
 function saveUserId(id){ try{ localStorage.setItem('arena_uid', id); }catch(e){} }
 function loadUserId(){ try{ return localStorage.getItem('arena_uid'); }catch(e){ return null; } }
 function saveBan(b){ try{ localStorage.setItem('arena_ban', JSON.stringify(b)); }catch(e){} }
-function loadBan(){ try{ const r = localStorage.getItem('arena_ban'); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
-
-/* ============ DOM ============ */
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const screens = $$('.screen');
-
-/* ============ UTILITIES ============ */
-function showScreen(id){
-  screens.forEach(s => s.classList.remove('active'));
-  if(id) document.getElementById(id).classList.add('active');
-}
+function loadBan(){ try{ const r=localStorage.getItem('arena_ban'); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function showScreen(id){ $$('.screen').forEach(s => s.classList.remove('active')); if(id) document.getElementById(id).classList.add('active'); }
 function toast(msg, type=''){
-  const el = $('#toast');
-  el.textContent = msg;
-  el.className = 'show ' + type;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = '', 2200);
+  const el = $('#toast'); el.textContent = msg; el.className = 'show ' + type;
+  clearTimeout(el._t); el._t = setTimeout(() => el.className = '', 2200);
 }
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function now(){ return Date.now(); }
-function formatTime(ts){
-  const d = new Date(ts);
-  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-}
-function randomName(){
-  const first = ['Ali','Omar','Sara','Noor','Yara','Layla','Hassan','Khalid','Fatima','Zain'];
-  const last = ['X','Pro','Ace','King','Ninja','Gamer','Wolf','Hawk'];
-  return first[Math.floor(Math.random()*first.length)] + '_' + last[Math.floor(Math.random()*last.length)];
-}
+function formatTime(ts){ const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
 function confirmDialog(title, text, {yesLabel, noLabel, extra}={}){
   return new Promise(resolve => {
-    $('#confirmTitle').textContent = title || t('reset');
+    $('#confirmTitle').textContent = title || 'تأكيد';
     $('#confirmText').textContent = text || '';
-    const extraEl = $('#confirmExtra');
-    extraEl.innerHTML = '';
+    const extraEl = $('#confirmExtra'); extraEl.innerHTML = '';
     if(extra && extra.input){
       const inp = document.createElement('input');
       inp.type = extra.input.type || 'text';
       inp.placeholder = extra.input.placeholder || '';
       inp.value = extra.input.value || '';
-      if(extra.input.type === 'number'){ inp.min = extra.input.min || 1; inp.max = extra.input.max || 99999; }
-      extraEl.appendChild(inp);
-      extra.input.ref = inp;
+      if(extra.input.type === 'number'){ inp.min = extra.input.min || 1; inp.max = extra.input.max || 9999; }
+      extraEl.appendChild(inp); extra.input.ref = inp;
     }
-    const ov = $('#confirmOverlay');
-    ov.classList.add('active');
+    const ov = $('#confirmOverlay'); ov.classList.add('active');
     const yes = $('#confirmYes'), no = $('#confirmNo');
-    yes.textContent = yesLabel || 'نعم';
-    no.textContent = noLabel || 'لا';
-    const cleanup = (val) => {
-      ov.classList.remove('active');
-      yes.onclick = null; no.onclick = null;
-      resolve(val);
-    };
+    yes.textContent = yesLabel || 'نعم'; no.textContent = noLabel || 'لا';
+    const cleanup = v => { ov.classList.remove('active'); yes.onclick = null; no.onclick = null; resolve(v); };
     yes.onclick = () => cleanup(extra && extra.input ? extra.input.ref.value : true);
     no.onclick = () => cleanup(false);
-    if(extra && extra.input && extra.input.ref){
-      setTimeout(() => extra.input.ref.focus(), 100);
-    }
+    if(extra && extra.input && extra.input.ref) setTimeout(() => extra.input.ref.focus(), 100);
   });
 }
 function applyI18n(){
   document.documentElement.lang = settings.lang;
   document.documentElement.dir = T.dir;
-  $$('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if(T[key]) el.textContent = T[key];
-  });
-  $$('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if(T[key]) el.placeholder = T[key];
-  });
+  $$('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if(T[k]) el.textContent = T[k]; });
+  $$('[data-i18n-placeholder]').forEach(el => { const k = el.getAttribute('data-i18n-placeholder'); if(T[k]) el.placeholder = T[k]; });
   $('#uTitle').textContent = t('username');
   $('#uDesc').textContent = t('enterName');
   $('#uContinue').textContent = t('continue');
   $('#loading .label').textContent = t('connecting');
+  const ci = $('#chatInput'); if(ci) ci.placeholder = t('chatPlaceholder');
 }
 
 /* ============ TOUCH BUTTONS ============ */
@@ -580,303 +580,189 @@ function renderTouchButtons(container){
     let el = container.querySelector(`[data-tb="${name}"]`);
     if(!el){
       el = document.createElement('button');
-      el.className = 'touch-btn';
-      el.dataset.tb = name;
+      el.className = 'touch-btn'; el.dataset.tb = name;
       el.textContent = name === 'chat' ? '💬' : name === 'menu' ? '☰' : '👥';
       container.appendChild(el);
     }
     const bx = Math.max(0, Math.min(b.x, vw - b.w));
     const by = Math.max(0, Math.min(b.y, vh - b.h));
-    el.style.left = bx + 'px';
-    el.style.top = by + 'px';
-    el.style.width = b.w + 'px';
-    el.style.height = b.h + 'px';
+    el.style.left = bx + 'px'; el.style.top = by + 'px';
+    el.style.width = b.w + 'px'; el.style.height = b.h + 'px';
     el.style.opacity = b.opacity;
   });
 }
 function bindTouchButtonActions(){
   $$('#touchMenu .touch-btn').forEach(el => {
-    el.addEventListener('click', e => {
+    el.onclick = e => {
       e.stopPropagation();
-      if(el.classList.contains('editing')) return;
       const name = el.dataset.tb;
       if(name === 'chat'){
         if(session.mode !== 'live'){ toast(t('chatOnlyLive'), 'warn'); return; }
         toggleChat();
-      } else if(name === 'menu'){
-        openPauseMenu();
-      } else if(name === 'players'){
-        openPlayersList();
-      }
-    });
+      } else if(name === 'menu') openPauseMenu();
+      else if(name === 'players') openPlayersModal();
+    };
   });
 }
 
-/* ============ NETWORK (SUPABASE) ============ */
+/* ============ SUPABASE ============ */
 async function initSupabase(){
   try{
-    session.supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: true, autoRefreshToken: false }
-    });
-    let { data: { session: supaSession }, error: se } = await session.supabase.auth.getSession();
-    if(se) throw se;
-    if(!supaSession){
-      const { data, error } = await session.supabase.auth.signInAnonymously();
-      if(error) throw error;
+    session.supabase = createClient(SUPABASE_URL, SUPABASE_KEY, { auth:{ persistSession:true, autoRefreshToken:false } });
+    let { data:{ session: ss }, error } = await session.supabase.auth.getSession();
+    if(error) throw error;
+    if(!ss){
+      const { data, error: e2 } = await session.supabase.auth.signInAnonymously();
+      if(e2) throw e2;
       session.userId = data.user.id;
-    } else {
-      session.userId = supaSession.user.id;
-    }
+    } else session.userId = ss.user.id;
     session.online = true;
     $('#connStatus').textContent = t('online2');
     $('#connStatus').className = 'online';
     saveUserId(session.userId);
   } catch(err){
-    console.warn('Supabase init failed, using local mode:', err);
+    console.warn('Supabase failed:', err);
     session.online = false;
     session.userId = loadUserId() || ('local_' + Math.random().toString(36).slice(2,10));
     saveUserId(session.userId);
-    $('#connStatus').textContent = t('offline');
+    $('#connStatus').textContent = t('testMode');
     $('#connStatus').className = 'offline';
   }
 }
-
 async function joinLiveChannel(){
-  if(!session.online || !session.supabase){
-    startSimulation();
-    return;
-  }
+  if(!session.online || !session.supabase){ startSimulation(); return; }
   try{
     const channel = session.supabase.channel('arena_global', {
       config: { presence: { key: session.userId }, broadcast: { self: true } }
     });
     session.channel = channel;
-
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState();
       session.players.clear();
-      Object.entries(state).forEach(([key, presences]) => {
-        presences.forEach(p => {
-          session.players.set(p.user_id, { id: p.user_id, name: p.name, joined: p.joined || now() });
-        });
-      });
-      renderPlayers();
-      updateHudInfo();
+      Object.entries(state).forEach(([k, arr]) => arr.forEach(p => {
+        session.players.set(p.user_id, { id: p.user_id, name: p.name, joined: p.joined || now() });
+      }));
+      renderPlayersList(); updateHudInfo();
     });
-
     channel.on('broadcast', { event: 'chat' }, ({ payload }) => {
       if(payload.type === 'message'){
-        session.messages.push({
-          id: payload.id, authorId: payload.authorId, author: payload.author,
-          text: payload.text, ts: payload.ts, deleted: false, fromBroadcast: true
-        });
+        session.messages.push({ id: payload.id, authorId: payload.authorId, author: payload.author,
+          text: payload.text, ts: payload.ts, deleted: false });
         if(session.messages.length > 100) session.messages.shift();
-        renderChat();
-        renderOperatorMessages();
+        renderChat(); renderOperatorMessages();
       } else if(payload.type === 'delete'){
         const m = session.messages.find(x => x.id === payload.id);
         if(m){ m.deleted = true; renderChat(); renderOperatorMessages(); }
-      } else if(payload.type === 'ban'){
-        if(payload.targetId === session.userId){
-          applyBan({ until: payload.until, reason: payload.reason, by: payload.by });
-        }
-      } else if(payload.type === 'warn'){
-        if(payload.targetId === session.userId){
-          toast(t('warn') + ': ' + (payload.reason || ''), 'warn');
-        }
-      } else if(payload.type === 'kick'){
-        if(payload.targetId === session.userId){
-          toast('You were kicked', 'error');
-          setTimeout(() => leaveGame(), 600);
-        }
+      } else if(payload.type === 'ban' && payload.targetId === session.userId){
+        applyBan({ until: payload.until, reason: payload.reason, by: payload.by });
+      } else if(payload.type === 'warn' && payload.targetId === session.userId){
+        toast(t('warn') + ': ' + (payload.reason || ''), 'warn');
       }
     });
-
-    await channel.subscribe(async (status) => {
-      if(status === 'SUBSCRIBED'){
-        await channel.track({ user_id: session.userId, name: session.username, joined: now() });
-      }
+    await channel.subscribe(async status => {
+      if(status === 'SUBSCRIBED') await channel.track({ user_id: session.userId, name: session.username, joined: now() });
     });
-  } catch(err){
-    console.warn('Live channel failed:', err);
-    startSimulation();
-  }
+  } catch(err){ console.warn('Channel failed:', err); startSimulation(); }
 }
-
 function startSimulation(){
   session.online = false;
   $('#connStatus').textContent = t('testMode');
   $('#connStatus').className = 'offline';
-  // Add fake players
-  const names = ['Ali_X','Sara_Pro','Omar_King','Noor_Ninja'];
-  names.forEach((n,i) => {
-    session.players.set('bot_' + i, { id: 'bot_'+i, name: n, joined: now(), isBot: true });
-  });
-  renderPlayers();
-  updateHudInfo();
-  // Fake chat messages
-  const msgs = [
-    ['Ali_X', 'السلام عليكم'],
-    ['Sara_Pro', 'Hi everyone!'],
-    ['Omar_King', 'من جاهز للمباراة؟'],
-    ['Noor_Ninja', 'gg let\'s go'],
-  ];
-  msgs.forEach(([n, txt], i) => {
-    setTimeout(() => {
-      session.messages.push({
-        id: 'sim_' + i, authorId: 'bot_' + (i % 4), author: n,
-        text: txt, ts: now() - (4-i)*60000, deleted: false
-      });
-      renderChat();
-      renderOperatorMessages();
-    }, 800 + i * 1200);
-  });
-  // Periodic bots messages
-  const botMsgs = ['من يريد اللعب؟','هيا بنا!','لحظة','جيد جداً','😂','🔥','استعد'];
-  const botTimer = setInterval(() => {
+  ['Ali_X','Sara_Pro','Omar_King','Noor_Ninja'].forEach((n,i) =>
+    session.players.set('bot_'+i, { id:'bot_'+i, name:n, joined:now(), isBot:true })
+  );
+  renderPlayersList(); updateHudInfo();
+  [['Ali_X','السلام عليكم'],['Sara_Pro','Hi everyone!'],['Omar_King','من جاهز؟'],['Noor_Ninja','gg let\'s go']]
+    .forEach(([n,txt],i) => setTimeout(() => {
+      session.messages.push({ id:'sim_'+i, authorId:'bot_'+(i%4), author:n, text:txt, ts:now()-(4-i)*60000, deleted:false });
+      renderChat(); renderOperatorMessages();
+    }, 800 + i * 1200));
+  const msgs = ['من يريد اللعب؟','هيا بنا!','لحظة','جيد جداً','😂','🔥','استعد'];
+  const timer = setInterval(() => {
     if(session.mode !== 'live') return;
-    const bots = Array.from(session.players.values()).filter(p => p.isBot);
+    const bots = [...session.players.values()].filter(p => p.isBot);
     if(!bots.length) return;
     const bot = bots[Math.floor(Math.random()*bots.length)];
-    const text = botMsgs[Math.floor(Math.random()*botMsgs.length)];
-    session.messages.push({
-      id: 'sim_' + now(), authorId: bot.id, author: bot.name,
-      text, ts: now(), deleted: false
-    });
+    session.messages.push({ id:'sim_'+now(), authorId:bot.id, author:bot.name,
+      text:msgs[Math.floor(Math.random()*msgs.length)], ts:now(), deleted:false });
     if(session.messages.length > 100) session.messages.shift();
-    renderChat();
-    renderOperatorMessages();
+    renderChat(); renderOperatorMessages();
   }, 15000);
-  session.botTimers.push(botTimer);
+  session.botTimers.push(timer);
 }
-
 async function sendChat(text){
   if(session.mode !== 'live'){ toast(t('chatOnlyLive'), 'warn'); return; }
   if(!text.trim()) return;
-  const msg = {
-    id: 'm_' + session.userId + '_' + now(),
-    authorId: session.userId, author: session.username,
-    text: text.trim(), ts: now(), deleted: false
-  };
+  const msg = { id:'m_'+session.userId+'_'+now(), authorId:session.userId, author:session.username,
+    text:text.trim(), ts:now(), deleted:false };
   session.messages.push(msg);
   if(session.messages.length > 100) session.messages.shift();
-  renderChat();
-  renderOperatorMessages();
+  renderChat(); renderOperatorMessages();
   if(session.channel){
-    try{
-      await session.channel.send({
-        type: 'broadcast', event: 'chat',
-        payload: { type: 'message', ...msg }
-      });
-    } catch(e){ console.warn(e); }
+    try{ await session.channel.send({ type:'broadcast', event:'chat', payload:{ type:'message', ...msg } }); }catch(e){}
   }
 }
-
-async function deleteChatMsg(msg){
-  msg.deleted = true;
-  renderChat();
-  renderOperatorMessages();
+async function deleteMsg(msg){
+  msg.deleted = true; renderChat(); renderOperatorMessages();
   if(session.channel){
-    try{
-      await session.channel.send({
-        type: 'broadcast', event: 'chat',
-        payload: { type: 'delete', id: msg.id }
-      });
-    } catch(e){ console.warn(e); }
+    try{ await session.channel.send({ type:'broadcast', event:'chat', payload:{ type:'delete', id: msg.id } }); }catch(e){}
   }
-  toast(t('deleteSuccess'), 'success');
+  toast(t('deleted'), 'success');
 }
-
 async function banPlayer(player, minutes, reason){
   const until = now() + minutes * 60000;
   if(session.channel){
-    try{
-      await session.channel.send({
-        type: 'broadcast', event: 'chat',
-        payload: { type: 'ban', targetId: player.id, until, reason, by: session.username }
-      });
-    } catch(e){ console.warn(e); }
+    try{ await session.channel.send({ type:'broadcast', event:'chat',
+      payload:{ type:'ban', targetId: player.id, until, reason, by: session.username } }); }catch(e){}
   }
-  if(player.id === session.userId){
-    applyBan({ until, reason, by: session.username });
-  }
-  toast(t('banSuccess') + ': ' + player.name, 'success');
+  if(player.id === session.userId) applyBan({ until, reason, by: session.username });
+  toast(t('banned') + ': ' + player.name, 'success');
 }
-
 async function warnPlayer(player, reason){
   if(session.channel){
-    try{
-      await session.channel.send({
-        type: 'broadcast', event: 'chat',
-        payload: { type: 'warn', targetId: player.id, reason, by: session.username }
-      });
-    } catch(e){ console.warn(e); }
+    try{ await session.channel.send({ type:'broadcast', event:'chat',
+      payload:{ type:'warn', targetId: player.id, reason, by: session.username } }); }catch(e){}
   }
-  toast(t('warnSuccess') + ': ' + player.name, 'warn');
+  toast(t('warned') + ': ' + player.name, 'warn');
 }
-
 function applyBan(info){
-  session.isBanned = true;
-  session.banInfo = info;
   saveBan(info);
   if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} }
-  leaveGame(true);
-  showScreen('banScreen');
-  renderBanScreen();
+  leaveGame();
+  session.banInfo = info;
+  showScreen('banScreen'); renderBanScreen();
 }
-
 function renderBanScreen(){
-  const info = session.banInfo;
-  if(!info) return;
+  const info = session.banInfo; if(!info) return;
   const remaining = Math.max(0, info.until - now());
   const mins = Math.floor(remaining / 60000);
   const secs = Math.floor((remaining % 60000) / 1000);
   $('#banInfo').innerHTML = `
     <div class="row"><span>${t('bannedUntil')}</span><span class="countdown">${mins}:${secs.toString().padStart(2,'0')}</span></div>
     <div class="row"><span>${t('reason')}</span><span>${escapeHtml(info.reason || '-')}</span></div>
-    <div class="row"><span>By</span><span>${escapeHtml(info.by || '-')}</span></div>
-  `;
+    <div class="row"><span>By</span><span>${escapeHtml(info.by || '-')}</span></div>`;
   if(remaining <= 0){
-    session.isBanned = false;
     session.banInfo = null;
     try{ localStorage.removeItem('arena_ban'); }catch(e){}
-    showScreen('mainMenu');
-  } else {
-    setTimeout(renderBanScreen, 1000);
-  }
+    showScreen('mainMenu'); startPreview();
+  } else setTimeout(renderBanScreen, 1000);
 }
-
 function checkBan(){
   const info = loadBan();
-  if(info && info.until > now()){
-    session.banInfo = info;
-    session.isBanned = true;
-    showScreen('banScreen');
-    renderBanScreen();
-    return true;
-  } else if(info){
-    try{ localStorage.removeItem('arena_ban'); }catch(e){}
-  }
+  if(info && info.until > now()){ session.banInfo = info; showScreen('banScreen'); renderBanScreen(); return true; }
+  if(info) try{ localStorage.removeItem('arena_ban'); }catch(e){}
   return false;
 }
 
 /* ============ CHAT UI ============ */
-function toggleChat(){
-  const el = $('#chatPanel');
-  el.classList.toggle('open');
-  if(el.classList.contains('open')) renderChat();
-}
+function toggleChat(){ $('#chatPanel').classList.toggle('open'); if($('#chatPanel').classList.contains('open')) renderChat(); }
 function renderChat(){
-  const el = $('#chatMessages');
-  if(!el) return;
+  const el = $('#chatMessages'); if(!el) return;
   const msgs = session.messages.filter(m => !m.deleted);
-  if(!msgs.length){
-    el.innerHTML = `<div class="chat-empty">${t('noMessages')}</div>`;
-    return;
-  }
+  if(!msgs.length){ el.innerHTML = `<div class="chat-empty">${t('noMessages')}</div>`; return; }
   el.innerHTML = msgs.map(m => {
     const isMe = m.authorId === session.userId;
-    return `<div class="chat-msg ${isMe ? 'me' : ''}" data-id="${escapeHtml(m.id)}">
+    return `<div class="chat-msg ${isMe ? 'me' : ''}">
       <div class="author">${escapeHtml(m.author)}</div>
       <div>${escapeHtml(m.text)}</div>
       <div class="time">${formatTime(m.ts)}</div>
@@ -885,132 +771,123 @@ function renderChat(){
   el.scrollTop = el.scrollHeight;
 }
 
-/* ============ PLAYERS LIST ============ */
-function renderPlayers(){
-  updateHudInfo();
-  renderOperatorPlayers();
-  if($('#playerListOverlay')?.classList.contains('active')){
-    // handled by openPlayersList
-  }
-}
+/* ============ PLAYERS ============ */
+function renderPlayersList(){ updateHudInfo(); renderOperatorPlayers(); }
 function updateHudInfo(){
-  const el = $('#hudInfo');
-  if(!el) return;
+  const el = $('#hudInfo'); if(!el) return;
   el.innerHTML = `
     <div class="hud-badge">👤 <strong>${escapeHtml(session.username || t('you'))}</strong></div>
-    <div class="hud-badge">🌐 ${session.mode === 'live' ? t('online') : t('singleMode')} · ${session.players.size + 1}</div>
-  `;
+    <div class="hud-badge">🌐 ${session.mode === 'live' ? t('online') : t('singleMode')} · ${session.players.size + 1}</div>`;
 }
-async function openPlayersList(){
-  const names = [{ id: session.userId, name: session.username, you: true }];
-  session.players.forEach(p => {
-    if(p.id !== session.userId) names.push({ id: p.id, name: p.name });
-  });
-  const html = names.map(p => `
-    <div class="player-row">
-      <div class="player-avatar">${escapeHtml(p.name.charAt(0).toUpperCase())}</div>
+function openPlayersModal(){
+  const rows = [{ id:session.userId, name:session.username, you:true }, ...[...session.players.values()].filter(p => p.id !== session.userId)];
+  const html = rows.map(p => `
+    <div class="player-row" style="margin:6px 0">
+      <div class="player-avatar">${escapeHtml((p.name||'?').charAt(0).toUpperCase())}</div>
       <div class="player-info">
-        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· ' + t('you') : ''}</div>
+        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· '+t('you') : ''}</div>
         <div class="player-status">${t('online')}</div>
       </div>
-    </div>
-  `).join('');
-  await confirmDialog(t('players'), '', { yesLabel: 'OK', noLabel: '✕' });
-  // Actually show via a simple modal using confirm overlay approach
-  showPlayersModal(html);
-}
-function showPlayersModal(html){
-  const ov = $('#confirmOverlay');
-  $('#confirmTitle').textContent = t('players');
-  $('#confirmText').innerHTML = '<div style="max-height:50vh;overflow-y:auto;text-align:right">' + html + '</div>';
-  $('#confirmExtra').innerHTML = '';
-  $('#confirmYes').textContent = 'OK';
-  $('#confirmNo').style.display = 'none';
-  ov.classList.add('active');
-  $('#confirmYes').onclick = () => {
-    ov.classList.remove('active');
-    $('#confirmNo').style.display = '';
-  };
+    </div>`).join('');
+  confirmDialog(t('players'), '', { yesLabel:'OK', noLabel:'✕', extra:{} });
+  $('#confirmText').innerHTML = '<div style="max-height:50vh;overflow-y:auto">' + html + '</div>';
 }
 
 /* ============ MAIN MENU ============ */
 function bindMainMenu(){
   $$('#mainMenu .menu-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const action = btn.dataset.action;
-      if(action === 'single') startGame('single');
-      else if(action === 'live'){
+    btn.onclick = () => {
+      const a = btn.dataset.action;
+      if(a === 'single') startGame('single');
+      else if(a === 'live'){
         if(checkBan()) return;
         if(!session.username){ showScreen('usernameScreen'); return; }
         startGame('live');
       }
-      else if(action === 'options'){ openOptions(); }
-      else if(action === 'operator'){ openOperator(); }
-    });
+      else if(a === 'options') openOptions();
+      else if(a === 'operator') requestAdminAccess();
+    };
   });
+}
+
+/* ============ ADMIN PIN ============ */
+function requestAdminAccess(){
+  session.pinInput = '';
+  updatePinDisplay();
+  $('#lockError').textContent = '';
+  showScreen('adminLock');
+}
+function updatePinDisplay(){
+  const dots = $$('#pinDisplay .pin-dot');
+  dots.forEach((d, i) => d.classList.toggle('filled', i < session.pinInput.length));
+}
+function pinKeyPress(val){
+  if(val === 'back'){ session.pinInput = session.pinInput.slice(0, -1); updatePinDisplay(); return; }
+  if(val === 'clear'){ session.pinInput = ''; updatePinDisplay(); return; }
+  if(session.pinInput.length >= 5) return;
+  session.pinInput += val;
+  updatePinDisplay();
+  if(session.pinInput.length === 5) setTimeout(checkPin, 150);
+}
+function checkPin(){
+  if(session.pinInput === ADMIN_PIN){
+    session.isAdmin = session.username === ADMIN_USERNAME;
+    session.isOperator = true;
+    session.pinInput = '';
+    updatePinDisplay();
+    openOperator();
+  } else {
+    $('#pinDisplay').classList.add('shake');
+    $('#lockError').textContent = t('wrongPin');
+    setTimeout(() => {
+      $('#pinDisplay').classList.remove('shake');
+      session.pinInput = '';
+      updatePinDisplay();
+      $('#lockError').textContent = '';
+    }, 500);
+  }
+}
+function bindAdminLock(){
+  $$('#adminLock .pin-pad button').forEach(b => {
+    b.onclick = () => pinKeyPress(b.dataset.pin);
+  });
+  $('#lockExit').onclick = () => { session.pinInput = ''; updatePinDisplay(); showScreen('mainMenu'); startPreview(); };
 }
 
 /* ============ OPTIONS ============ */
 function openOptions(){
+  stopPreview();
   showScreen('options');
   $('#optLang').value = settings.lang;
-  $('#optPov').value = settings.pov;
-  $('#optPovVal').textContent = settings.pov;
+  $('#optPov').value = settings.pov; $('#optPovVal').textContent = settings.pov;
   $('#optGyro').classList.toggle('on', settings.gyro);
-  $('#optCamPC').value = settings.camSpeedPC;
-  $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1) + 'x';
-  $('#optCamMobile').value = settings.camSpeedMobile;
-  $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1) + 'x';
+  $('#optCamPC').value = settings.camSpeedPC; $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1)+'x';
+  $('#optCamMobile').value = settings.camSpeedMobile; $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1)+'x';
 }
 function bindOptions(){
-  $('#optBack').onclick = () => showScreen('mainMenu');
+  $('#optBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
   $('#optLang').onchange = e => {
-    settings.lang = e.target.value;
-    T = LANGS[settings.lang];
-    saveSettings();
-    applyI18n();
-    renderChat();
-    updateHudInfo();
+    settings.lang = e.target.value; T = LANGS[settings.lang]; saveSettings(); applyI18n();
+    renderChat(); updateHudInfo();
     toast(settings.lang === 'ar' ? 'تم تغيير اللغة' : 'Language changed', 'success');
   };
   $('#optPov').oninput = e => {
-    settings.pov = +e.target.value;
-    $('#optPovVal').textContent = settings.pov;
-    saveSettings();
-    if(session.camera){
-      session.camera.fov = settings.pov;
-      session.camera.updateProjectionMatrix();
-    }
+    settings.pov = +e.target.value; $('#optPovVal').textContent = settings.pov; saveSettings();
+    if(session.camera){ session.camera.fov = settings.pov; session.camera.updateProjectionMatrix(); }
   };
   $('#optGyro').onclick = () => {
-    settings.gyro = !settings.gyro;
-    $('#optGyro').classList.toggle('on', settings.gyro);
-    saveSettings();
-    if(settings.gyro) enableGyro();
-    else disableGyro();
+    settings.gyro = !settings.gyro; $('#optGyro').classList.toggle('on', settings.gyro); saveSettings();
+    if(settings.gyro) enableGyro(); else disableGyro();
   };
-  $('#optCamPC').oninput = e => {
-    settings.camSpeedPC = +e.target.value;
-    $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1) + 'x';
-    saveSettings();
-  };
-  $('#optCamMobile').oninput = e => {
-    settings.camSpeedMobile = +e.target.value;
-    $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1) + 'x';
-    saveSettings();
-  };
+  $('#optCamPC').oninput = e => { settings.camSpeedPC = +e.target.value; $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1)+'x'; saveSettings(); };
+  $('#optCamMobile').oninput = e => { settings.camSpeedMobile = +e.target.value; $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1)+'x'; saveSettings(); };
   $('#optEditTouch').onclick = () => openTouchEditor();
   $('#optReset').onclick = async () => {
-    const ok = await confirmDialog(t('reset'), t('resetConfirm'), {
-      yesLabel: t('resetConfirmBtn'), noLabel: t('cancel')
-    });
+    const ok = await confirmDialog(t('reset'), t('resetConfirm'), { yesLabel: t('resetConfirmBtn'), noLabel: t('cancel') });
     if(ok){
-      const lang = settings.lang;
-      const username = settings.username;
+      const lang = settings.lang, username = settings.username;
       settings = { ...DEFAULT_SETTINGS, lang, username, touchButtons:null };
-      saveSettings();
-      applyI18n();
-      openOptions();
+      saveSettings(); applyI18n(); openOptions();
       toast(settings.lang === 'ar' ? 'تمت إعادة التعيين' : 'Reset done', 'success');
     }
   };
@@ -1020,9 +897,7 @@ function bindOptions(){
 function enableGyro(){
   if(typeof DeviceOrientationEvent === 'undefined') return;
   if(typeof DeviceOrientationEvent.requestPermission === 'function'){
-    DeviceOrientationEvent.requestPermission().then(res => {
-      if(res === 'granted') attachGyro();
-    }).catch(()=>{});
+    DeviceOrientationEvent.requestPermission().then(r => { if(r === 'granted') attachGyro(); }).catch(()=>{});
   } else attachGyro();
 }
 function attachGyro(){
@@ -1030,10 +905,8 @@ function attachGyro(){
   session.deviceOrientationHandler = e => {
     if(!settings.gyro || !session.camera) return;
     if(e.alpha !== null){
-      const yaw = (e.alpha * Math.PI) / 180;
-      const pitch = ((e.beta || 0) - 90) * Math.PI / 180;
-      session.yaw = -yaw;
-      session.pitch = Math.max(-1.4, Math.min(1.4, -pitch));
+      session.yaw = -(e.alpha * Math.PI) / 180;
+      session.pitch = Math.max(-1.4, Math.min(1.4, -(((e.beta || 0) - 90) * Math.PI / 180)));
     }
   };
   window.addEventListener('deviceorientation', session.deviceOrientationHandler);
@@ -1049,26 +922,18 @@ function disableGyro(){
 function openTouchEditor(){
   showScreen('');
   $('#editorOverlay').classList.add('active');
-  $('#editorTopbar').style.display = 'flex';
+  $('#editorTopbar').classList.add('active');
   document.body.classList.add('editor-mode');
-  // Create a temporary container with buttons
-  const overlay = $('#editorOverlay');
-  overlay.innerHTML = '';
+  const overlay = $('#editorOverlay'); overlay.innerHTML = '';
   const btns = getTouchButtons();
   Object.entries(btns).forEach(([name, b]) => {
     const el = document.createElement('div');
-    el.className = 'touch-btn';
-    el.dataset.tb = name;
+    el.className = 'touch-btn'; el.dataset.tb = name;
     el.textContent = name === 'chat' ? '💬' : name === 'menu' ? '☰' : '👥';
-    el.style.left = b.x + 'px';
-    el.style.top = b.y + 'px';
-    el.style.width = b.w + 'px';
-    el.style.height = b.h + 'px';
-    el.style.opacity = b.opacity;
+    el.style.left = b.x + 'px'; el.style.top = b.y + 'px';
+    el.style.width = b.w + 'px'; el.style.height = b.h + 'px'; el.style.opacity = b.opacity;
     el.style.position = 'absolute';
-    // Resize handle
-    const rh = document.createElement('div');
-    rh.className = 'resize-handle';
+    const rh = document.createElement('div'); rh.className = 'resize-handle';
     el.appendChild(rh);
     overlay.appendChild(el);
     attachEditorDrag(el, name, rh);
@@ -1077,17 +942,12 @@ function openTouchEditor(){
   session.editorSelection = null;
   $('#edInfo').textContent = t('selectButton');
 }
-
 function attachEditorDrag(el, name, handle){
   let mode = null, startX = 0, startY = 0, startRect = null;
   const btns = getTouchButtons();
-
   const onDown = (e, isResize) => {
     e.preventDefault(); e.stopPropagation();
-    if(el.classList.contains('selected')) {
-      // allow
-    } else {
-      // deselect others
+    if(!el.classList.contains('selected')){
       $('#editorOverlay').querySelectorAll('.touch-btn').forEach(b => b.classList.remove('selected'));
       el.classList.add('selected');
       session.editorSelection = name;
@@ -1102,40 +962,30 @@ function attachEditorDrag(el, name, handle){
     startX = pt.clientX; startY = pt.clientY;
     startRect = { x: btns[name].x, y: btns[name].y, w: btns[name].w, h: btns[name].h };
   };
-
   el.addEventListener('mousedown', e => { if(e.target === handle) return; onDown(e, false); });
   el.addEventListener('touchstart', e => { if(e.target === handle) return; onDown(e, false); }, {passive:false});
   handle.addEventListener('mousedown', e => onDown(e, true));
   handle.addEventListener('touchstart', e => onDown(e, true), {passive:false});
-
   const onMove = e => {
     if(!mode) return;
     const pt = e.touches ? e.touches[0] : e;
-    const dx = pt.clientX - startX;
-    const dy = pt.clientY - startY;
+    const dx = pt.clientX - startX, dy = pt.clientY - startY;
     const vw = window.innerWidth, vh = window.innerHeight;
     if(mode === 'move'){
-      let nx = startRect.x + dx;
-      let ny = startRect.y + dy;
-      nx = Math.max(0, Math.min(nx, vw - startRect.w));
-      ny = Math.max(0, Math.min(ny, vh - startRect.h));
-      // check overlap
+      let nx = Math.max(0, Math.min(startRect.x + dx, vw - startRect.w));
+      let ny = Math.max(0, Math.min(startRect.y + dy, vh - startRect.h));
       if(!wouldOverlap(name, nx, ny, startRect.w, startRect.h)){
         btns[name].x = nx; btns[name].y = ny;
         el.style.left = nx + 'px'; el.style.top = ny + 'px';
       }
-    } else if(mode === 'resize'){
+    } else {
       let nw = Math.max(40, Math.min(startRect.w + dx, 120));
       let nh = Math.max(40, Math.min(startRect.h + dy, 120));
-      // ensure stays on screen
-      const maxW = vw - startRect.x;
-      const maxH = vh - startRect.y;
-      nw = Math.min(nw, maxW); nh = Math.min(nh, maxH);
+      nw = Math.min(nw, vw - startRect.x); nh = Math.min(nh, vh - startRect.y);
       if(!wouldOverlap(name, startRect.x, startRect.y, nw, nh)){
         btns[name].w = nw; btns[name].h = nh;
         el.style.width = nw + 'px'; el.style.height = nh + 'px';
-        $('#edSize').value = nw;
-        $('#edSizeVal').textContent = nw + 'px';
+        $('#edSize').value = nw; $('#edSizeVal').textContent = nw + 'px';
       }
     }
   };
@@ -1145,29 +995,20 @@ function attachEditorDrag(el, name, handle){
   window.addEventListener('mouseup', onUp);
   window.addEventListener('touchend', onUp);
 }
-
-function wouldOverlap(excludeName, x, y, w, h){
-  const btns = getTouchButtons();
-  const pad = 4;
+function wouldOverlap(exclude, x, y, w, h){
+  const btns = getTouchButtons(), pad = 4;
   for(const [name, b] of Object.entries(btns)){
-    if(name === excludeName) continue;
-    const bx = b.x, by = b.y, bw = b.w, bh = b.h;
-    if(x < bx + bw + pad && x + w + pad > bx && y < by + bh + pad && y + h + pad > by){
-      return true;
-    }
+    if(name === exclude) continue;
+    if(x < b.x + b.w + pad && x + w + pad > b.x && y < b.y + b.h + pad && y + h + pad > b.y) return true;
   }
   return false;
 }
-
 function bindEditor(){
   $('#edBack').onclick = () => closeEditor(true);
   $('#edReset').onclick = async () => {
-    const ok = await confirmDialog(t('reset'), t('resetConfirm'), {yesLabel: t('resetConfirmBtn'), noLabel: t('cancel')});
+    const ok = await confirmDialog(t('reset'), t('resetConfirm'), { yesLabel: t('resetConfirmBtn'), noLabel: t('cancel') });
     if(ok){
-      settings.touchButtons = null;
-      initTouchButtons();
-      saveSettings();
-      openTouchEditor(); // re-render
+      settings.touchButtons = null; initTouchButtons(); saveSettings(); openTouchEditor();
       toast(settings.lang === 'ar' ? 'تمت إعادة التعيين' : 'Reset done', 'success');
     }
   };
@@ -1175,8 +1016,7 @@ function bindEditor(){
     if(!session.editorSelection) return;
     const v = +e.target.value;
     $('#edOpacityVal').textContent = v + '%';
-    const btns = getTouchButtons();
-    btns[session.editorSelection].opacity = v / 100;
+    getTouchButtons()[session.editorSelection].opacity = v / 100;
     const el = $('#editorOverlay').querySelector(`[data-tb="${session.editorSelection}"]`);
     if(el) el.style.opacity = v / 100;
     saveSettings();
@@ -1184,251 +1024,334 @@ function bindEditor(){
   $('#edSize').oninput = e => {
     if(!session.editorSelection) return;
     const v = +e.target.value;
-    $('#edSizeVal').textContent = v + 'px';
-    const btns = getTouchButtons();
-    const b = btns[session.editorSelection];
-    // check overlap before resizing
+    const b = getTouchButtons()[session.editorSelection];
     if(wouldOverlap(session.editorSelection, b.x, b.y, v, v)){
-      $('#edSize').value = b.w;
-      $('#edSizeVal').textContent = b.w + 'px';
-      return;
+      $('#edSize').value = b.w; $('#edSizeVal').textContent = b.w + 'px'; return;
     }
+    $('#edSizeVal').textContent = v + 'px';
     b.w = v; b.h = v;
     const el = $('#editorOverlay').querySelector(`[data-tb="${session.editorSelection}"]`);
-    if(el){
-      el.style.width = v + 'px';
-      el.style.height = v + 'px';
-    }
+    if(el){ el.style.width = v + 'px'; el.style.height = v + 'px'; }
     saveSettings();
   };
 }
-
-function closeEditor(backToOptions){
+function closeEditor(back){
   $('#editorOverlay').classList.remove('active');
-  $('#editorTopbar').style.display = 'none';
+  $('#editorTopbar').classList.remove('active');
   $('#editorBottom').classList.remove('active');
   document.body.classList.remove('editor-mode');
   renderTouchButtons($('#touchMenu'));
-  if(backToOptions) showScreen('options');
+  if(back){ showScreen('options'); } 
+}
+
+/* ============ MINECRAFT WORLD BUILDER ============ */
+function createSky(scene){
+  const skyGeo = new THREE.SphereGeometry(500, 32, 16);
+  const skyMat = new THREE.ShaderMaterial({
+    uniforms: {
+      topColor: { value: new THREE.Color(0x3a7bd5) },
+      bottomColor: { value: new THREE.Color(0xd4f0ff) },
+      offset: { value: 30 },
+      exponent: { value: 0.8 }
+    },
+    vertexShader: `varying vec3 vWorldPosition;
+      void main(){
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = wp.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: `uniform vec3 topColor; uniform vec3 bottomColor;
+      uniform float offset; uniform float exponent; varying vec3 vWorldPosition;
+      void main(){
+        float h = normalize(vWorldPosition + offset).y;
+        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+      }`,
+    side: THREE.BackSide, depthWrite: false
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+}
+function addLights(scene){
+  const sun = new THREE.DirectionalLight(0xfff4d6, 1.4);
+  sun.position.set(80, 120, 40); scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  scene.add(new THREE.HemisphereLight(0x87ceeb, 0x4caf50, 0.5));
+  const sunSphere = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff8d0 }));
+  sunSphere.position.set(150, 180, 90); scene.add(sunSphere);
+}
+function addClouds(scene){
+  const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+  for(let i = 0; i < 20; i++){
+    const w = 12 + Math.random() * 25;
+    const h = 2 + Math.random() * 3;
+    const d = 10 + Math.random() * 18;
+    const c = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    c.position.set((Math.random()-0.5)*350, 70 + Math.random()*40, (Math.random()-0.5)*350);
+    scene.add(c);
+  }
+}
+function createTree(scene, x, y, z){
+  const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8b5a2b });
+  const leafMat = new THREE.MeshLambertMaterial({ color: 0x2d8a2d });
+  const trunkGeo = new THREE.BoxGeometry(1, 1, 1);
+  for(let i = 0; i < 4; i++){
+    const m = new THREE.Mesh(trunkGeo, trunkMat);
+    m.position.set(x, y + 0.5 + i, z); scene.add(m);
+  }
+  const leafGeo = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+  for(let lx = -1; lx <= 1; lx++) for(let lz = -1; lz <= 1; lz++){
+    if(lx === 0 && lz === 0) continue;
+    const m = new THREE.Mesh(leafGeo, leafMat);
+    m.position.set(x + lx, y + 4, z + lz); scene.add(m);
+  }
+  for(let lx = -1; lx <= 1; lx++) for(let lz = -1; lz <= 1; lz++){
+    const m = new THREE.Mesh(leafGeo, leafMat);
+    m.position.set(x + lx, y + 5, z + lz); scene.add(m);
+  }
+  const top = new THREE.Mesh(leafGeo, leafMat);
+  top.position.set(x, y + 6, z); scene.add(top);
+}
+function createTower(scene, x, y, z){
+  const colors = [0x808080, 0x8b5a2b, 0xa0522d, 0x9e7b5a];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const mat = new THREE.MeshLambertMaterial({ color });
+  const h = 3 + Math.floor(Math.random() * 4);
+  for(let i = 0; i < h; i++){
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
+    m.position.set(x, y + 0.5 + i, z); scene.add(m);
+  }
+}
+function createMinecraftWorld(opts = {}){
+  const { gridRadius = 22, treeCount = 14, towerCount = 8 } = opts;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xd4f0ff);
+  scene.fog = new THREE.Fog(0xd4f0ff, 90, 220);
+  createSky(scene);
+  addLights(scene);
+  addClouds(scene);
+  // Flat real ground plane
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(1000, 1000),
+    new THREE.MeshLambertMaterial({ color: 0x5cb85c })
+  );
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+  // Block grid (grass blocks)
+  const blockSize = 2;
+  const blockGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+  const grassMat = new THREE.MeshLambertMaterial({ color: 0x6cc24a });
+  const count = (gridRadius * 2 + 1) ** 2;
+  const inst = new THREE.InstancedMesh(blockGeo, grassMat, count);
+  const dummy = new THREE.Object3D();
+  let i = 0;
+  for(let x = -gridRadius; x <= gridRadius; x++){
+    for(let z = -gridRadius; z <= gridRadius; z++){
+      dummy.position.set(x * blockSize, -blockSize / 2, z * blockSize);
+      dummy.updateMatrix();
+      inst.setMatrixAt(i++, dummy.matrix);
+    }
+  }
+  inst.instanceMatrix.needsUpdate = true; scene.add(inst);
+  // Trees
+  for(let k = 0; k < treeCount; k++){
+    const a = Math.random() * Math.PI * 2;
+    const r = 10 + Math.random() * (gridRadius * blockSize * 0.65);
+    createTree(scene, Math.cos(a)*r, 0, Math.sin(a)*r);
+  }
+  // Towers
+  for(let k = 0; k < towerCount; k++){
+    const x = (Math.random()-0.5) * gridRadius * blockSize * 1.3;
+    const z = (Math.random()-0.5) * gridRadius * blockSize * 1.3;
+    createTower(scene, x, 0, z);
+  }
+  return scene;
+}
+
+/* ============ PREVIEW (MENU BACKGROUND) ============ */
+function startPreview(){
+  if(session.previewActive) return;
+  session.previewActive = true;
+  const canvas = $('#previewCanvas');
+  if(!canvas) return;
+  const w = window.innerWidth, h = window.innerHeight;
+  canvas.width = w * Math.min(window.devicePixelRatio, 2);
+  canvas.height = h * Math.min(window.devicePixelRatio, 2);
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h, false);
+  session.previewRenderer = renderer;
+
+  const scene = createMinecraftWorld({ gridRadius: 12, treeCount: 8, towerCount: 5 });
+  session.previewScene = scene;
+
+  const camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+  session.previewCamera = camera;
+
+  let time = 0;
+  const animate = () => {
+    if(!session.previewActive) return;
+    session.previewAnimId = requestAnimationFrame(animate);
+    time += 0.005;
+    const radius = 34;
+    const angle = time * 0.15;
+    camera.position.x = Math.cos(angle) * radius;
+    camera.position.z = Math.sin(angle) * radius;
+    camera.position.y = 18 + Math.sin(time * 0.6) * 3;
+    camera.lookAt(0, 4, 0);
+    renderer.render(scene, camera);
+  };
+  animate();
+
+  const onResize = () => {
+    if(!session.previewActive) return;
+    const w2 = window.innerWidth, h2 = window.innerHeight;
+    renderer.setSize(w2, h2, false);
+    camera.aspect = w2/h2; camera.updateProjectionMatrix();
+    canvas.style.width = w2 + 'px'; canvas.style.height = h2 + 'px';
+  };
+  window.addEventListener('resize', onResize);
+  session.previewResizeHandler = onResize;
+}
+function stopPreview(){
+  session.previewActive = false;
+  if(session.previewAnimId){ cancelAnimationFrame(session.previewAnimId); session.previewAnimId = null; }
+  if(session.previewResizeHandler){ window.removeEventListener('resize', session.previewResizeHandler); session.previewResizeHandler = null; }
+  if(session.previewRenderer){ try{ session.previewRenderer.dispose(); }catch(e){} session.previewRenderer = null; }
+  if(session.previewScene){ session.previewScene.traverse(o => {
+    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
+    if(o.material) try{ o.material.dispose(); }catch(e){}
+  }); session.previewScene = null; }
+  session.previewCamera = null;
 }
 
 /* ============ GAME ============ */
 function startGame(mode){
   if(mode === 'live' && checkBan()) return;
+  stopPreview();
   session.mode = mode;
   showScreen('game');
   initGameScene();
   renderTouchButtons($('#touchMenu'));
   bindTouchButtonActions();
   updateHudInfo();
-  if(mode === 'live'){
-    joinLiveChannel();
-  } else {
-    // single player - no chat
-    session.players.clear();
-    session.messages = [];
-  }
+  if(mode === 'live') joinLiveChannel();
+  else { session.players.clear(); session.messages = []; }
 }
-
-function leaveGame(fromBan){
-  // cleanup scene
-  if(session.animId) cancelAnimationFrame(session.animId);
-  if(session.renderer){
-    try{ session.renderer.dispose(); }catch(e){}
-  }
-  if(session.scene){
-    session.scene.traverse(o => {
-      if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
-      if(o.material) try{ o.material.dispose(); }catch(e){}
-    });
-  }
-  session.scene = null; session.camera = null; session.renderer = null;
-  session.mode = null;
-  session.botTimers.forEach(t => clearInterval(t));
-  session.botTimers = [];
-  if(session.channel){
-    try{ session.channel.unsubscribe(); }catch(e){}
-    session.channel = null;
-  }
+function leaveGame(){
+  if(session.animId){ cancelAnimationFrame(session.animId); session.animId = null; }
+  if(session.renderer){ try{ session.renderer.dispose(); }catch(e){} session.renderer = null; }
+  if(session.scene){ session.scene.traverse(o => {
+    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
+    if(o.material) try{ o.material.dispose(); }catch(e){}
+  }); session.scene = null; }
+  session.camera = null; session.mode = null;
+  session.botTimers.forEach(t => clearInterval(t)); session.botTimers = [];
+  if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} session.channel = null; }
   $('#chatPanel').classList.remove('open');
-  if(!fromBan) showScreen('mainMenu');
+  showScreen('mainMenu'); startPreview();
 }
-
 function initGameScene(){
   const canvas = $('#gameCanvas');
-  const rect = canvas.getBoundingClientRect();
   const w = window.innerWidth, h = window.innerHeight;
   canvas.width = w; canvas.height = h;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(w, h, false);
   session.renderer = renderer;
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x05070d);
-  scene.fog = new THREE.Fog(0x05070d, 20, 70);
+  const scene = createMinecraftWorld({ gridRadius: 25, treeCount: 20, towerCount: 12 });
   session.scene = scene;
 
-  const camera = new THREE.PerspectiveCamera(settings.pov, w/h, 0.1, 200);
-  camera.position.set(0, 1.6, 0);
+  const camera = new THREE.PerspectiveCamera(settings.pov, w/h, 0.1, 1000);
+  camera.position.set(0, 1.7, 0);
   camera.rotation.order = 'YXZ';
   session.camera = camera;
+  session.yaw = 0; session.pitch = 0;
 
-  // Floor
-  const floorGeo = new THREE.PlaneGeometry(200, 200);
-  const floorMat = new THREE.MeshBasicMaterial({ color: 0x0a1220 });
-  const floor = new THREE.Mesh(floorGeo, floorMat);
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = -0.01;
-  scene.add(floor);
-
-  // Grid
-  const grid = new THREE.GridHelper(200, 100, 0x00e5ff, 0x003344);
-  grid.material.opacity = 0.5;
-  grid.material.transparent = true;
-  scene.add(grid);
-
-  // Neon pillars
-  const colors = [0x00e5ff, 0xa855f7, 0xff00aa];
-  for(let i = 0; i < 40; i++){
-    const hgt = 2 + Math.random() * 6;
-    const geo = new THREE.BoxGeometry(0.8, hgt, 0.8);
-    const c = colors[Math.floor(Math.random() * colors.length)];
-    const mat = new THREE.MeshStandardMaterial({
-      color: c, emissive: c, emissiveIntensity: 0.6,
-      metalness: 0.8, roughness: 0.3
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    const angle = Math.random() * Math.PI * 2;
-    const r = 6 + Math.random() * 35;
-    mesh.position.set(Math.cos(angle) * r, hgt/2, Math.sin(angle) * r);
-    mesh.userData.baseY = hgt/2;
-    mesh.userData.phase = Math.random() * Math.PI * 2;
-    scene.add(mesh);
-  }
-
-  // Ceiling lights
-  scene.add(new THREE.AmbientLight(0x6666aa, 0.6));
-  const l1 = new THREE.PointLight(0x00e5ff, 1.5, 80);
-  l1.position.set(0, 12, 0); scene.add(l1);
-  const l2 = new THREE.PointLight(0xa855f7, 1, 60);
-  l2.position.set(15, 8, 15); scene.add(l2);
-  const l3 = new THREE.PointLight(0xff00aa, 1, 60);
-  l3.position.set(-15, 8, -15); scene.add(l3);
-
-  // Input handlers
   bindGameInput(canvas);
-
-  // Resize
   window.addEventListener('resize', onGameResize);
 
-  // Animation
   let last = performance.now();
   const animate = () => {
     session.animId = requestAnimationFrame(animate);
-    const now2 = performance.now();
-    const dt = (now2 - last) / 1000;
-    last = now2;
-    // apply look
+    const t = performance.now(); const dt = (t - last) / 1000; last = t;
     camera.rotation.y = session.yaw;
     camera.rotation.x = session.pitch;
-    // movement
-    const speed = 4 * dt;
-    const forward = new THREE.Vector3(-Math.sin(session.yaw), 0, -Math.cos(session.yaw));
+    const speed = 6 * dt;
+    const fwd = new THREE.Vector3(-Math.sin(session.yaw), 0, -Math.cos(session.yaw));
     const right = new THREE.Vector3(Math.cos(session.yaw), 0, -Math.sin(session.yaw));
-    if(session.keys['w'] || session.keys['arrowup']) camera.position.addScaledVector(forward, speed);
-    if(session.keys['s'] || session.keys['arrowdown']) camera.position.addScaledVector(forward, -speed);
+    if(session.keys['w'] || session.keys['arrowup']) camera.position.addScaledVector(fwd, speed);
+    if(session.keys['s'] || session.keys['arrowdown']) camera.position.addScaledVector(fwd, -speed);
     if(session.keys['a'] || session.keys['arrowleft']) camera.position.addScaledVector(right, -speed);
     if(session.keys['d'] || session.keys['arrowright']) camera.position.addScaledVector(right, speed);
-    // bob pillars
-    scene.children.forEach(o => {
-      if(o.userData && o.userData.baseY !== undefined){
-        o.position.y = o.userData.baseY + Math.sin(now2 * 0.001 + o.userData.phase) * 0.3;
-      }
-    });
+    camera.position.y = 1.7;
     renderer.render(scene, camera);
   };
   animate();
 }
-
 function bindGameInput(canvas){
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const speedMult = () => isMobile ? settings.camSpeedMobile : settings.camSpeedPC;
-  const lookSens = 0.0025;
-
+  const sens = () => 0.0025 * (isMobile ? settings.camSpeedMobile : settings.camSpeedPC);
   const onDown = e => {
     if(e.target.closest('.touch-btn') || e.target.closest('#chatPanel')) return;
     session.dragging = true;
     const pt = e.touches ? e.touches[0] : e;
-    session.lastX = pt.clientX;
-    session.lastY = pt.clientY;
+    session.lastX = pt.clientX; session.lastY = pt.clientY;
   };
   const onMove = e => {
     if(!session.dragging) return;
     const pt = e.touches ? e.touches[0] : e;
-    const dx = pt.clientX - session.lastX;
-    const dy = pt.clientY - session.lastY;
-    session.lastX = pt.clientX;
-    session.lastY = pt.clientY;
-    session.yaw -= dx * lookSens * speedMult();
-    session.pitch -= dy * lookSens * speedMult();
+    const dx = pt.clientX - session.lastX, dy = pt.clientY - session.lastY;
+    session.lastX = pt.clientX; session.lastY = pt.clientY;
+    session.yaw -= dx * sens(); session.pitch -= dy * sens();
     session.pitch = Math.max(-1.45, Math.min(1.45, session.pitch));
   };
   const onUp = () => { session.dragging = false; };
-
   canvas.addEventListener('mousedown', onDown);
   canvas.addEventListener('touchstart', onDown, {passive:true});
   window.addEventListener('mousemove', onMove);
   window.addEventListener('touchmove', onMove, {passive:true});
   window.addEventListener('mouseup', onUp);
   window.addEventListener('touchend', onUp);
-
   window.addEventListener('keydown', e => {
     if(document.activeElement.tagName === 'INPUT') return;
     session.keys[e.key.toLowerCase()] = true;
   });
-  window.addEventListener('keyup', e => {
-    session.keys[e.key.toLowerCase()] = false;
-  });
+  window.addEventListener('keyup', e => { session.keys[e.key.toLowerCase()] = false; });
 }
-
 function onGameResize(){
   if(!session.renderer || !session.camera) return;
   const w = window.innerWidth, h = window.innerHeight;
   session.renderer.setSize(w, h, false);
-  session.camera.aspect = w/h;
-  session.camera.updateProjectionMatrix();
-  const canvas = $('#gameCanvas');
-  canvas.width = w; canvas.height = h;
-  // reclamp touch buttons
+  session.camera.aspect = w/h; session.camera.updateProjectionMatrix();
+  const canvas = $('#gameCanvas'); canvas.width = w; canvas.height = h;
   const btns = getTouchButtons();
   Object.values(btns).forEach(b => {
     b.x = Math.max(0, Math.min(b.x, w - b.w));
     b.y = Math.max(0, Math.min(b.y, h - b.h));
   });
-  saveSettings();
-  renderTouchButtons($('#touchMenu'));
+  saveSettings(); renderTouchButtons($('#touchMenu'));
 }
-
 function openPauseMenu(){
-  confirmDialog(t('pause'), t('resume') + ' / ' + t('options'), {
-    yesLabel: t('resume'),
-    noLabel: t('backToMenu')
-  }).then(res => {
-    if(res === false){
-      leaveGame();
-    }
-  });
+  const ov = $('#confirmOverlay');
+  $('#confirmTitle').textContent = t('pause');
+  $('#confirmText').textContent = t('resume') + ' / ' + t('options');
+  $('#confirmExtra').innerHTML = '';
+  $('#confirmYes').textContent = t('resume');
+  $('#confirmNo').textContent = t('backToMenu');
+  ov.classList.add('active');
+  $('#confirmYes').onclick = () => { ov.classList.remove('active'); };
+  $('#confirmNo').onclick = () => { ov.classList.remove('active'); leaveGame(); };
 }
 
 /* ============ OPERATOR ============ */
-async function openOperator(){
+function openOperator(){
   showScreen('operator');
+  const badge = $('#opAdminBadge');
+  if(session.username === ADMIN_USERNAME){ badge.textContent = 'ADMIN ' + session.username; badge.style.display = ''; }
+  else { badge.textContent = 'GUEST'; badge.style.display = ''; }
   renderOperatorPlayers();
   renderOperatorMessages();
-  bindOperatorTabs();
-}
-function bindOperatorTabs(){
   $$('.op-tab').forEach(tab => {
     tab.onclick = () => {
       $$('.op-tab').forEach(x => x.classList.remove('active'));
@@ -1440,29 +1363,21 @@ function bindOperatorTabs(){
   });
 }
 function renderOperatorPlayers(){
-  const el = $('#opPlayers');
-  if(!el) return;
-  const names = [{ id: session.userId, name: session.username || t('you'), you: true }];
-  session.players.forEach(p => {
-    if(p.id !== session.userId) names.push(p);
-  });
-  if(!names.length){
-    el.innerHTML = `<div style="color:var(--text-dim);text-align:center;padding:20px">${t('noPlayers')}</div>`;
-    return;
-  }
-  el.innerHTML = names.map(p => `
+  const el = $('#opPlayers'); if(!el) return;
+  const rows = [{ id:session.userId, name:session.username || t('you'), you:true }, ...[...session.players.values()].filter(p => p.id !== session.userId)];
+  if(!rows.length){ el.innerHTML = ''; return; }
+  el.innerHTML = rows.map(p => `
     <div class="player-row">
       <div class="player-avatar">${escapeHtml((p.name||'?').charAt(0).toUpperCase())}</div>
       <div class="player-info">
-        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· ' + t('you') : ''}</div>
+        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· '+t('you') : ''}</div>
         <div class="player-status">${t('online')}</div>
       </div>
       <div class="player-actions">
         <button class="btn small warn" data-op="warn" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">${t('warn')}</button>
         <button class="btn small danger" data-op="ban" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">${t('ban')}</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
   el.querySelectorAll('[data-op]').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.dataset.id, name = btn.dataset.name;
@@ -1473,13 +1388,13 @@ function renderOperatorPlayers(){
           extra: { input: { type:'text', placeholder: t('reason') } }
         });
         if(reason !== false) warnPlayer(player, reason || '');
-      } else if(btn.dataset.op === 'ban'){
-        const reason = await confirmDialog(t('confirmBan'), '', {
+      } else {
+        const result = await confirmDialog(t('confirmBan'), '', {
           yesLabel: t('ban'), noLabel: t('cancel'),
-          extra: { input: { type:'number', placeholder: t('banDuration'), value: '5', min:1, max:1440 } }
+          extra: { input: { type:'number', placeholder: t('banDuration'), value:'5', min:1, max:1440 } }
         });
-        if(reason !== false){
-          const minutes = Math.max(1, parseInt(reason) || 5);
+        if(result !== false){
+          const minutes = Math.max(1, parseInt(result) || 5);
           banPlayer(player, minutes, 'Banned by operator');
         }
       }
@@ -1487,14 +1402,9 @@ function renderOperatorPlayers(){
   });
 }
 function renderOperatorMessages(){
-  const el = $('#opMessages');
-  if(!el) return;
-  const msgs = session.messages;
-  if(!msgs.length){
-    el.innerHTML = `<div style="color:var(--text-dim);text-align:center;padding:20px">${t('noMessages')}</div>`;
-    return;
-  }
-  el.innerHTML = msgs.slice(-50).map(m => `
+  const el = $('#opMessages'); if(!el) return;
+  if(!session.messages.length){ el.innerHTML = `<div style="color:var(--text-dim);text-align:center;padding:20px">${t('noMessages')}</div>`; return; }
+  el.innerHTML = session.messages.slice(-50).map(m => `
     <div class="msg-row">
       <div class="msg-content">
         <div class="msg-author">${escapeHtml(m.author)}</div>
@@ -1502,15 +1412,11 @@ function renderOperatorMessages(){
         <div class="msg-time">${formatTime(m.ts)}</div>
       </div>
       <button class="btn small danger" data-del="${escapeHtml(m.id)}" ${m.deleted ? 'disabled' : ''}>${t('delete')}</button>
-    </div>
-  `).join('');
+    </div>`).join('');
   el.querySelectorAll('[data-del]').forEach(btn => {
     btn.onclick = async () => {
       const ok = await confirmDialog(t('confirmDelete'), '', { yesLabel: t('delete'), noLabel: t('cancel') });
-      if(ok){
-        const msg = session.messages.find(x => x.id === btn.dataset.del);
-        if(msg) deleteChatMsg(msg);
-      }
+      if(ok){ const msg = session.messages.find(x => x.id === btn.dataset.del); if(msg) deleteMsg(msg); }
     };
   });
 }
@@ -1521,66 +1427,41 @@ async function boot(){
   initTouchButtons();
   await initSupabase();
 
-  // Username
-  const savedName = settings.username;
-  if(savedName && savedName.trim()){
-    session.username = savedName;
-  } else {
-    showScreen('usernameScreen');
-  }
+  if(settings.username && settings.username.trim()) session.username = settings.username;
+  else showScreen('usernameScreen');
 
-  // Event bindings
   bindMainMenu();
   bindOptions();
   bindEditor();
-  bindOperatorTabs();
-  $('#opBack').onclick = () => showScreen('mainMenu');
+  bindAdminLock();
+
+  $('#opBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
   $('#uContinue').onclick = () => {
     const v = $('#uInput').value.trim();
     if(!v){ toast(t('enterName2'), 'error'); return; }
-    session.username = v;
-    settings.username = v;
-    saveSettings();
-    showScreen('mainMenu');
+    session.username = v; settings.username = v; saveSettings();
+    showScreen('mainMenu'); startPreview();
   };
-  $('#uInput').addEventListener('keydown', e => {
-    if(e.key === 'Enter') $('#uContinue').click();
-  });
+  $('#uInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#uContinue').click(); });
   $('#chatClose').onclick = () => $('#chatPanel').classList.remove('open');
-  $('#chatSend').onclick = () => {
-    const v = $('#chatInput').value;
-    if(v.trim()){ sendChat(v); $('#chatInput').value = ''; }
-  };
-  $('#chatInput').addEventListener('keydown', e => {
-    if(e.key === 'Enter'){ $('#chatSend').click(); }
-  });
-  $('#banExit').onclick = () => { showScreen('mainMenu'); };
+  $('#chatSend').onclick = () => { const v = $('#chatInput').value; if(v.trim()){ sendChat(v); $('#chatInput').value = ''; } };
+  $('#chatInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#chatSend').click(); });
+  $('#banExit').onclick = () => { showScreen('mainMenu'); startPreview(); };
 
-  // Re-check ban
-  checkBan();
-
-  // Show main menu
-  if(!$('#usernameScreen').classList.contains('active') && !$('#banScreen').classList.contains('active')){
+  if(!checkBan()){
     showScreen('mainMenu');
+    setTimeout(startPreview, 50);
   }
 
   window.addEventListener('resize', () => {
-    if(session.mode){ onGameResize(); }
-    renderTouchButtons($('#touchMenu'));
+    if(session.mode) onGameResize();
+    if(session.previewActive) renderTouchButtons($('#touchMenu'));
   });
 
-  // Handle visibility for gyro
-  document.addEventListener('visibilitychange', () => {
-    if(document.hidden){
-      session.keys = {};
-    }
-  });
+  document.addEventListener('visibilitychange', () => { if(document.hidden) session.keys = {}; });
 }
 
-boot().catch(err => {
-  console.error(err);
-  showScreen('mainMenu');
-});
+boot().catch(err => { console.error(err); showScreen('mainMenu'); });
 </script>
 </body>
 </html>
