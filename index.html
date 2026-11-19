@@ -2,235 +2,273 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>ARENA — Minecraft Live</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ARENA · Minecraft Live</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-:root{
-  --bg0:#05070d;--bg1:#0d1220;--bg2:#1a2033;
-  --primary:#00e5ff;--secondary:#a855f7;
-  --danger:#ef4444;--warn:#f59e0b;--success:#10b981;
-  --text:#e2e8f0;--text-dim:#94a3b8;
-  --border:rgba(0,229,255,0.25);
-  --glass:rgba(13,18,32,0.72);
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0f1a;color:#e2e8f0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;touch-action:none}
 button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
 input,select{font-family:inherit;font-size:inherit;color:inherit;outline:none}
 
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;overflow:hidden}
 .screen.active{display:flex}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
 .overlay.active{display:flex}
 
 /* Loading */
 #loading{background:radial-gradient(circle at center,#0d1220,#05070d);gap:20px}
-.spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+.spinner{width:48px;height:48px;border:3px solid rgba(0,229,255,0.2);border-top-color:#00e5ff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loading .label{color:var(--text-dim);font-size:14px;letter-spacing:.1em}
+#loading .label{color:#94a3b8;font-size:14px;letter-spacing:0.1em}
 
-/* Main Menu with 3D Preview */
+/* Main Menu */
 #mainMenu{display:none;background:#000}
 #mainMenu.active{display:block}
 #previewCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
-.menu-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
-  background:radial-gradient(ellipse at center,rgba(5,10,20,0.15) 0%,rgba(5,10,20,0.65) 70%,rgba(5,10,20,0.9) 100%);
-  backdrop-filter:blur(3px)}
-.menu-title{font-size:clamp(48px,12vw,96px);font-weight:900;letter-spacing:.18em;line-height:1;
-  background:linear-gradient(135deg,#00e5ff 0%,#a855f7 50%,#ff00aa 100%);
+.menu-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;background:radial-gradient(ellipse at center,rgba(5,10,20,0.2) 0%,rgba(5,10,20,0.7) 70%,rgba(5,10,20,0.92) 100%)}
+.menu-title{font-size:clamp(44px,11vw,88px);font-weight:900;letter-spacing:0.2em;line-height:1;
+  background:linear-gradient(135deg,#00e5ff 0%,#a855f7 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 0 30px rgba(0,229,255,0.5));margin-bottom:6px;text-align:center}
-.menu-subtitle{color:rgba(255,255,255,0.7);letter-spacing:.5em;font-size:11px;margin-bottom:36px;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
-.menu-buttons{display:flex;flex-direction:column;gap:12px;width:min(300px,85vw)}
-.menu-btn{padding:16px 24px;background:rgba(10,20,35,0.75);border:1.5px solid rgba(0,229,255,0.35);border-radius:14px;
-  font-size:16px;font-weight:700;letter-spacing:.06em;transition:all .25s;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(12px);color:#fff;
-  box-shadow:0 4px 20px rgba(0,0,0,0.4)}
-.menu-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,0.25),rgba(168,85,247,0.25));opacity:0;transition:opacity .25s;z-index:-1}
-.menu-btn:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 10px 30px rgba(0,229,255,0.3)}
-.menu-btn:hover::before{opacity:1}
-.menu-btn:active{transform:translateY(0) scale(.97)}
-.menu-version{position:absolute;bottom:16px;right:20px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.15em;z-index:3}
+.menu-subtitle{color:rgba(255,255,255,0.7);letter-spacing:0.5em;font-size:11px;margin-bottom:40px;text-shadow:0 2px 10px rgba(0,0,0,0.9)}
+.menu-buttons{display:flex;flex-direction:column;gap:10px;width:min(320px,85vw)}
+.menu-btn{padding:15px 22px;background:rgba(10,20,35,0.85);border:1.5px solid rgba(0,229,255,0.45);border-radius:10px;
+  font-size:16px;font-weight:700;letter-spacing:0.04em;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
+  gap:10px;color:#fff;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.menu-btn:hover{transform:translateY(-2px);border-color:#00e5ff;box-shadow:0 8px 28px rgba(0,229,255,0.3);background:rgba(0,50,80,0.85)}
+.menu-btn:active{transform:translateY(0) scale(0.98)}
+.menu-version{position:absolute;bottom:16px;right:20px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.15em;z-index:3}
 
 /* Options */
 #options{background:radial-gradient(ellipse at center,#0d1220,#05070d);overflow-y:auto;padding:20px;display:none}
 #options.active{display:block}
-.options-container{width:min(580px,100%);margin:0 auto;padding:20px 0}
+.options-container{width:min(560px,100%);margin:0 auto;padding:20px 0}
 .options-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;position:sticky;top:0;padding:12px 0;
   background:linear-gradient(to bottom,rgba(5,7,13,1) 70%,transparent);z-index:2}
-.options-header h2{font-size:22px;background:linear-gradient(135deg,var(--primary),var(--secondary));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1}
-.option-section{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:12px;backdrop-filter:blur(12px)}
-.option-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:16px;flex-wrap:wrap}
+.options-header h2{font-size:22px;background:linear-gradient(135deg,#00e5ff,#a855f7);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1;text-align:center}
+.option-section{background:rgba(13,18,32,0.75);border:1px solid rgba(0,229,255,0.2);border-radius:10px;
+  padding:16px 18px;margin-bottom:12px;backdrop-filter:blur(12px)}
+.option-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);gap:16px;flex-wrap:wrap}
 .option-row:last-child{border-bottom:none}
 .option-label{font-weight:600;font-size:14px}
-.option-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
+.option-desc{font-size:12px;color:#94a3b8;margin-top:2px}
 .slider-wrap{display:flex;align-items:center;gap:10px;min-width:160px;flex:1;max-width:220px}
-.slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2)}
-.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 0 10px var(--primary)}
-.slider-wrap input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--primary);cursor:pointer}
-.slider-value{font-family:monospace;color:var(--primary);font-size:13px;min-width:50px;text-align:center;font-weight:700}
-.toggle{position:relative;width:52px;height:30px;background:var(--bg2);border-radius:15px;cursor:pointer;transition:background .25s;border:1px solid var(--border);flex-shrink:0}
-.toggle::after{content:'';position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;background:var(--text-dim);border-radius:50%;transition:all .25s}
-.toggle.on{background:rgba(0,229,255,0.3);border-color:var(--primary)}
-.toggle.on::after{left:calc(100% - 25px);background:var(--primary);box-shadow:0 0 12px var(--primary)}
-.sel{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;cursor:pointer;min-width:140px}
-.btn{padding:12px 20px;background:var(--glass);border:1px solid var(--border);border-radius:10px;font-weight:600;
-  transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(8px)}
-.btn:hover{border-color:var(--primary);background:rgba(0,229,255,0.12)}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--primary);color:var(--bg0);border-color:var(--primary)}
-.btn.primary:hover{background:var(--primary);filter:brightness(1.15)}
-.btn.danger{border-color:var(--danger);color:var(--danger)}
+.slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:#1a2033}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:#00e5ff;cursor:pointer;box-shadow:0 0 10px #00e5ff}
+.slider-wrap input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:#00e5ff}
+.slider-value{font-family:monospace;color:#00e5ff;font-size:13px;min-width:50px;text-align:center;font-weight:700}
+.toggle{position:relative;width:52px;height:30px;background:#1a2033;border-radius:15px;cursor:pointer;
+  transition:background 0.25s;border:1px solid rgba(0,229,255,0.2);flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;
+  background:#94a3b8;border-radius:50%;transition:all 0.25s}
+.toggle.on{background:rgba(0,229,255,0.3);border-color:#00e5ff}
+.toggle.on::after{left:calc(100% - 25px);background:#00e5ff;box-shadow:0 0 12px #00e5ff}
+.sel{padding:10px 14px;background:#1a2033;border:1px solid rgba(0,229,255,0.2);border-radius:10px;
+  color:#e2e8f0;font-size:14px;cursor:pointer;min-width:140px}
+.btn{padding:11px 18px;background:rgba(13,18,32,0.75);border:1px solid rgba(0,229,255,0.25);border-radius:10px;
+  font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  backdrop-filter:blur(8px);color:#e2e8f0}
+.btn:hover{border-color:#00e5ff;background:rgba(0,229,255,0.15)}
+.btn:active{transform:scale(0.97)}
+.btn.primary{background:#00e5ff;color:#05070d;border-color:#00e5ff}
+.btn.primary:hover{filter:brightness(1.15)}
+.btn.danger{border-color:#ef4444;color:#ef4444}
 .btn.danger:hover{background:rgba(239,68,68,0.15)}
-.btn.warn{border-color:var(--warn);color:var(--warn)}
+.btn.warn{border-color:#f59e0b;color:#f59e0b}
 .btn.warn:hover{background:rgba(245,158,11,0.15)}
 .btn.small{padding:8px 12px;font-size:13px}
 
-/* Touch Editor */
-.editor-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0a1428,#1a0f2e);z-index:40;display:none}
-.editor-overlay.active{display:block}
-.editor-topbar{position:fixed;top:0;left:0;right:0;padding:12px 16px;display:none;gap:10px;justify-content:space-between;
-  align-items:center;z-index:50;background:linear-gradient(to bottom,rgba(5,7,13,0.95),transparent);pointer-events:none}
-.editor-topbar.active{display:flex}
-.editor-topbar > *{pointer-events:auto}
-.editor-info{padding:8px 14px;background:rgba(0,229,255,0.15);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text-dim);max-width:50%}
-.editor-bottom{position:fixed;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(5,7,13,0.95),transparent);
-  display:none;z-index:50;gap:12px;flex-direction:column}
-.editor-bottom.active{display:flex}
-.editor-control{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:8px}
-.editor-control label{font-size:12px;color:var(--text-dim);display:flex;justify-content:space-between}
-.editor-control input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2)}
-.editor-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px var(--primary)}
-.editor-control input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--primary)}
-
 /* Game */
-#game{padding:0;background:#000;display:none}
+#game{display:none;padding:0;background:#87ceeb}
 #game.active{display:block}
 #gameCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
-#hud{position:absolute;inset:0;pointer-events:none;z-index:5}
-#hudInfo{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px}
-.hud-badge{padding:6px 12px;background:rgba(13,18,32,0.75);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text-dim);backdrop-filter:blur(8px)}
-.hud-badge strong{color:var(--primary)}
 
-/* Touch buttons */
-.touch-btn{position:absolute;border-radius:50%;background:rgba(13,18,32,0.7);border:2px solid var(--primary);color:var(--primary);
-  display:flex;align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(8px);transition:transform .15s;pointer-events:auto}
-.touch-btn:active{transform:scale(.92);background:rgba(0,229,255,0.3)}
-body.editor-mode .touch-btn{border-color:var(--warn);background:rgba(245,158,11,0.2);cursor:move}
-body.editor-mode .touch-btn.selected{border-color:var(--success);box-shadow:0 0 0 3px rgba(16,185,129,0.4);background:rgba(16,185,129,0.3)}
-body.editor-mode .touch-btn .resize-handle{position:absolute;bottom:-8px;right:-8px;width:22px;height:22px;background:var(--success);
-  border-radius:50%;border:2px solid white;cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;color:white}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;
+  color:rgba(255,255,255,0.9);font-size:26px;font-weight:300;text-shadow:0 0 3px #000;pointer-events:none;font-family:monospace}
+
+#hudTop{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;
+  align-items:flex-start;z-index:15;pointer-events:none;flex-wrap:wrap;gap:8px}
+#hudTop > *{pointer-events:auto}
+#hudInfo{display:flex;flex-direction:column;gap:6px}
+.hud-badge{padding:6px 12px;background:rgba(13,18,32,0.85);border:1px solid rgba(0,229,255,0.3);
+  border-radius:10px;font-size:12px;color:#94a3b8;backdrop-filter:blur(8px)}
+.hud-badge strong{color:#00e5ff}
+#topButtons{display:flex;gap:6px}
+.icon-btn{width:44px;height:44px;background:rgba(13,18,32,0.85);border:1px solid rgba(0,229,255,0.3);
+  border-radius:10px;font-size:20px;display:flex;align-items:center;justify-content:center;
+  color:#00e5ff;backdrop-filter:blur(8px);transition:all 0.15s}
+.icon-btn:active{transform:scale(0.92);background:rgba(0,229,255,0.25)}
+
+/* Joystick */
+#joystick{position:fixed;left:20px;bottom:130px;width:130px;height:130px;z-index:20;
+  border-radius:50%;background:rgba(13,18,32,0.5);border:2px solid rgba(0,229,255,0.35);
+  backdrop-filter:blur(8px);touch-action:none;display:none}
+#game.active #joystick{display:block}
+#joystickKnob{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#00e5ff,#007a99);
+  border:2px solid rgba(255,255,255,0.4);box-shadow:0 0 20px rgba(0,229,255,0.5);pointer-events:none;transition:transform 0.05s}
+
+/* Game actions */
+#gameActions{position:fixed;right:20px;bottom:130px;display:flex;flex-direction:column;gap:12px;
+  z-index:20;align-items:center}
+.action-btn{width:70px;height:70px;border-radius:50%;background:rgba(13,18,32,0.75);
+  border:2px solid rgba(0,229,255,0.5);color:#fff;font-size:28px;display:flex;align-items:center;
+  justify-content:center;backdrop-filter:blur(8px);transition:all 0.12s;touch-action:none}
+.action-btn:active{transform:scale(0.9);background:rgba(0,229,255,0.4)}
+.action-btn.jump{width:56px;height:56px;font-size:24px;border-color:rgba(16,185,129,0.6)}
+.action-btn.jump:active{background:rgba(16,185,129,0.4)}
+.action-btn.break{border-color:rgba(239,68,68,0.6)}
+.action-btn.break:active{background:rgba(239,68,68,0.4)}
+.action-btn.place{border-color:rgba(245,158,11,0.6)}
+.action-btn.place:active{background:rgba(245,158,11,0.4)}
+
+/* Hotbar */
+#hotbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;padding:6px;background:rgba(13,18,32,0.85);border-radius:10px;
+  border:1px solid rgba(0,229,255,0.35);z-index:20;backdrop-filter:blur(12px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);max-width:calc(100vw - 32px)}
+.hotbar-slot{width:52px;height:52px;border-radius:8px;background:rgba(255,255,255,0.05);
+  border:2px solid transparent;display:flex;align-items:center;justify-content:center;
+  position:relative;transition:all 0.15s;flex-shrink:0;overflow:hidden}
+.hotbar-slot.selected{border-color:#00e5ff;box-shadow:0 0 12px rgba(0,229,255,0.6);background:rgba(0,229,255,0.15)}
+.hotbar-slot .block-icon{width:38px;height:38px;border-radius:4px;border:1px solid rgba(0,0,0,0.3)}
+.hotbar-slot .slot-num{position:absolute;top:2px;right:4px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:700}
+@media(max-width:500px){.hotbar-slot{width:40px;height:40px}.hotbar-slot .block-icon{width:28px;height:28px}
+  .action-btn{width:60px;height:60px;font-size:24px}.action-btn.jump{width:48px;height:48px;font-size:20px}
+  #joystick{width:110px;height:110px;bottom:110px}#joystickKnob{width:50px;height:50px}
+  #gameActions{right:14px;bottom:110px;gap:10px}}
 
 /* Chat */
-#chatPanel{position:fixed;right:0;bottom:0;width:min(360px,100vw);max-height:60vh;height:60vh;background:var(--glass);
-  border-top-left-radius:16px;border:1px solid var(--border);z-index:30;display:none;flex-direction:column;backdrop-filter:blur(20px)}
-#chatPanel.open{display:flex}
-.chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600}
-.chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.chat-msg{background:rgba(255,255,255,0.05);border-radius:10px;padding:8px 12px;max-width:85%;align-self:flex-start;font-size:13px}
+#chatPanel{position:fixed;right:0;bottom:0;width:min(360px,100vw);max-height:55vh;height:55vh;
+  background:rgba(13,18,32,0.92);border-top-left-radius:10px;border:1px solid rgba(0,229,255,0.3);
+  z-index:50;display:none;flex-direction:column;backdrop-filter:blur(20px);transform:translateY(100%);transition:transform 0.25s}
+#chatPanel.open{display:flex;transform:translateY(0)}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+  border-bottom:1px solid rgba(0,229,255,0.2);font-weight:600;flex-shrink:0}
+.chat-messages{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.chat-msg{background:rgba(255,255,255,0.05);border-radius:8px;padding:6px 10px;max-width:85%;
+  align-self:flex-start;font-size:13px;word-wrap:break-word}
 .chat-msg.me{background:rgba(0,229,255,0.15);border:1px solid rgba(0,229,255,0.35);align-self:flex-end}
-.chat-msg .author{font-weight:700;color:var(--primary);font-size:12px;margin-bottom:2px}
-.chat-msg .time{font-size:10px;color:var(--text-dim);margin-top:2px}
-.chat-empty{color:var(--text-dim);text-align:center;padding:20px;font-size:13px}
-.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
-.chat-input-row input{flex:1;padding:10px 14px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--text)}
-.chat-input-row input:focus{border-color:var(--primary)}
-.chat-input-row button{padding:10px 18px;background:var(--primary);color:var(--bg0);border-radius:10px;font-weight:700;font-size:14px}
+.chat-msg .author{font-weight:700;color:#00e5ff;font-size:12px;margin-bottom:2px}
+.chat-msg .time{font-size:10px;color:#64748b;margin-top:2px}
+.chat-empty{color:#64748b;text-align:center;padding:20px;font-size:13px}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(0,229,255,0.2);flex-shrink:0}
+.chat-input-row input{flex:1;padding:10px 14px;background:#1a2033;border:1px solid rgba(0,229,255,0.25);
+  border-radius:8px;font-size:14px;color:#e2e8f0}
+.chat-input-row input:focus{border-color:#00e5ff}
+.chat-input-row button{padding:10px 18px;background:#00e5ff;color:#05070d;border-radius:8px;font-weight:700;font-size:14px}
 
-/* Admin Lock Screen */
+/* Inventory modal */
+.inv-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+@media(max-width:400px){.inv-grid{grid-template-columns:repeat(4,1fr)}}
+.inv-item{aspect-ratio:1;border-radius:10px;background:rgba(255,255,255,0.05);border:2px solid rgba(0,229,255,0.2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;transition:all 0.15s;padding:6px}
+.inv-item:hover{border-color:#00e5ff;background:rgba(0,229,255,0.1)}
+.inv-item:active{transform:scale(0.95)}
+.inv-item .block-icon{width:36px;height:36px;border-radius:4px;border:1px solid rgba(0,0,0,0.3)}
+.inv-item .inv-name{font-size:10px;color:#94a3b8;font-weight:600}
+
+/* Admin lock */
 #adminLock{background:radial-gradient(ellipse at center,#1a0f2e,#05070d);display:none;padding:20px}
 #adminLock.active{display:flex}
-.lock-container{width:min(340px,100%);background:var(--glass);border:1.5px solid var(--danger);border-radius:24px;padding:28px 24px;
-  backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(239,68,68,0.3),0 0 40px rgba(239,68,68,0.15);position:relative}
-.lock-icon{font-size:44px;text-align:center;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(239,68,68,0.6))}
-.lock-container h2{text-align:center;font-size:20px;margin-bottom:4px;color:var(--danger);font-weight:800;letter-spacing:.05em}
-.lock-container .lock-sub{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:20px}
-.pin-display{display:flex;justify-content:center;gap:12px;margin-bottom:24px}
-.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(239,68,68,0.5);background:transparent;transition:all .2s}
-.pin-dot.filled{background:var(--danger);border-color:var(--danger);box-shadow:0 0 12px var(--danger)}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
-.pin-display.shake{animation:shake .4s}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.pin-pad button{aspect-ratio:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;font-size:22px;
-  font-weight:700;color:var(--text);transition:all .12s;display:flex;align-items:center;justify-content:center}
-.pin-pad button:active{background:var(--danger);color:white;transform:scale(.94)}
-.pin-pad button.fn{font-size:16px;color:var(--text-dim);background:rgba(255,255,255,0.04)}
-.lock-exit-btn{width:100%;padding:14px;background:rgba(239,68,68,0.15);border:1.5px solid var(--danger);border-radius:14px;
-  color:var(--danger);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.lock-container{width:min(340px,100%);background:rgba(13,18,32,0.85);border:1.5px solid #ef4444;border-radius:10px;
+  padding:24px 22px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(239,68,68,0.3)}
+.lock-icon{font-size:42px;text-align:center;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(239,68,68,0.6))}
+.lock-container h2{text-align:center;font-size:19px;margin-bottom:4px;color:#ef4444;font-weight:800;letter-spacing:0.05em}
+.lock-container .lock-sub{text-align:center;font-size:13px;color:#94a3b8;margin-bottom:20px}
+.pin-display{display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(239,68,68,0.5);background:transparent;transition:all 0.2s}
+.pin-dot.filled{background:#ef4444;border-color:#ef4444;box-shadow:0 0 10px #ef4444}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pin-display.shake{animation:shake 0.4s}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.pin-pad button{aspect-ratio:1;background:#1a2033;border:1.5px solid rgba(0,229,255,0.2);border-radius:10px;
+  font-size:20px;font-weight:700;color:#e2e8f0;transition:all 0.12s;display:flex;align-items:center;justify-content:center}
+.pin-pad button:active{background:#ef4444;color:white;transform:scale(0.94)}
+.pin-pad button.fn{font-size:14px;color:#94a3b8;background:rgba(255,255,255,0.04)}
+.lock-exit-btn{width:100%;padding:12px;background:rgba(239,68,68,0.15);border:1.5px solid #ef4444;
+  border-radius:10px;color:#ef4444;font-weight:700;font-size:14px;display:flex;align-items:center;
+  justify-content:center;gap:10px;transition:all 0.2s}
 .lock-exit-btn:active{background:rgba(239,68,68,0.3)}
-.lock-exit-btn .exit-pin{font-family:monospace;font-size:14px;padding:3px 10px;background:rgba(239,68,68,0.25);border-radius:6px;
-  letter-spacing:.2em;color:#fff;font-weight:800}
-.lock-error{text-align:center;color:var(--danger);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
+.lock-exit-btn .exit-pin{font-family:monospace;font-size:13px;padding:3px 10px;background:rgba(239,68,68,0.25);
+  border-radius:6px;letter-spacing:0.2em;color:#fff;font-weight:800}
+.lock-error{text-align:center;color:#ef4444;font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
 
 /* Operator */
 #operator{background:radial-gradient(ellipse at center,#1a0f2e,#05070d);overflow-y:auto;padding:20px;display:none}
 #operator.active{display:block}
 .op-container{width:min(720px,100%);margin:0 auto;padding:20px 0}
-.op-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-.op-header h2{font-size:22px;background:linear-gradient(135deg,var(--warn),var(--danger));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1}
-.admin-badge{padding:6px 12px;background:rgba(16,185,129,0.2);border:1px solid var(--success);border-radius:20px;
-  font-size:12px;color:var(--success);font-weight:700}
-.op-note{padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:13px;color:var(--warn);margin-bottom:16px}
+.op-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.op-header h2{font-size:22px;background:linear-gradient(135deg,#f59e0b,#ef4444);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;flex:1;text-align:center}
+.admin-badge{padding:6px 12px;background:rgba(16,185,129,0.2);border:1px solid #10b981;border-radius:10px;
+  font-size:12px;color:#10b981;font-weight:700}
+.op-note{padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);
+  border-radius:10px;font-size:13px;color:#f59e0b;margin-bottom:16px}
 .op-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.op-tab{padding:10px 18px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:14px;transition:all .2s}
-.op-tab.active{background:var(--primary);color:var(--bg0);border-color:var(--primary)}
+.op-tab{padding:10px 18px;background:#0d1220;border:1px solid rgba(0,229,255,0.2);border-radius:10px;
+  font-weight:600;font-size:14px;transition:all 0.2s}
+.op-tab.active{background:#00e5ff;color:#05070d;border-color:#00e5ff}
 .op-panel{display:none}
 .op-panel.active{display:block}
-.player-row,.msg-row{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;
-  display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px);flex-wrap:wrap}
-.player-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));
-  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--bg0);flex-shrink:0}
+.player-row,.msg-row{background:rgba(13,18,32,0.75);border:1px solid rgba(0,229,255,0.2);border-radius:10px;
+  padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;backdrop-filter:blur(10px)}
+.player-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#a855f7);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#05070d;flex-shrink:0}
 .player-info{flex:1;min-width:120px}
 .player-name{font-weight:700}
-.player-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}
-.player-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success)}
+.player-status{font-size:12px;color:#10b981;display:flex;align-items:center;gap:4px}
+.player-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981}
 .player-actions{display:flex;gap:6px;flex-wrap:wrap}
 .msg-content{flex:1;min-width:200px}
-.msg-author{font-weight:700;color:var(--primary);font-size:13px}
+.msg-author{font-weight:700;color:#00e5ff;font-size:13px}
 .msg-text{font-size:14px;margin-top:2px;word-wrap:break-word}
-.msg-time{font-size:11px;color:var(--text-dim);margin-top:2px}
+.msg-time{font-size:11px;color:#64748b;margin-top:2px}
 
 /* Dialog */
-.dialog{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
+.dialog{background:#0d1220;border:1px solid rgba(0,229,255,0.25);border-radius:10px;padding:22px;
+  max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
 .dialog h3{font-size:18px;margin-bottom:12px}
-.dialog p{color:var(--text-dim);font-size:14px;margin-bottom:16px;line-height:1.5}
-.dialog input,.dialog textarea{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;margin-bottom:12px}
-.dialog input:focus{border-color:var(--primary)}
+.dialog p{color:#94a3b8;font-size:14px;margin-bottom:16px;line-height:1.5}
+.dialog input,.dialog textarea{width:100%;padding:10px 14px;background:#1a2033;
+  border:1px solid rgba(0,229,255,0.25);border-radius:10px;color:#e2e8f0;font-size:14px;margin-bottom:12px}
+.dialog input:focus{border-color:#00e5ff}
 .dialog-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 
 /* Ban screen */
-#banScreen{background:radial-gradient(ellipse at center,#2a0a0a,#05070d);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center}
+#banScreen{background:radial-gradient(ellipse at center,#2a0a0a,#05070d);z-index:300;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center}
 #banScreen.active{display:flex}
-#banScreen h1{font-size:36px;color:var(--danger);text-shadow:0 0 30px rgba(239,68,68,0.5)}
-#banScreen .ban-info{background:var(--glass);border:1px solid rgba(239,68,68,0.3);border-radius:16px;padding:20px;max-width:400px;width:100%}
-#banScreen .ban-info .row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+#banScreen h1{font-size:36px;color:#ef4444;text-shadow:0 0 30px rgba(239,68,68,0.5)}
+#banScreen .ban-info{background:rgba(13,18,32,0.85);border:1px solid rgba(239,68,68,0.3);border-radius:10px;
+  padding:20px;max-width:400px;width:100%}
+#banScreen .ban-info .row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;
+  border-bottom:1px solid rgba(255,255,255,0.05)}
 #banScreen .ban-info .row:last-child{border-bottom:none}
-#banScreen .ban-info .row span:first-child{color:var(--text-dim)}
-#banScreen .countdown{font-family:monospace;font-size:20px;color:var(--danger);font-weight:700}
+#banScreen .ban-info .row span:first-child{color:#94a3b8}
+#banScreen .countdown{font-family:monospace;font-size:20px;color:#ef4444;font-weight:700}
 
-/* Toast & Conn */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--glass);
-  border:1px solid var(--border);border-radius:12px;padding:12px 20px;z-index:500;font-size:14px;opacity:0;
-  transition:all .3s;backdrop-filter:blur(10px);pointer-events:none;max-width:90vw;text-align:center}
+/* Toast & Connection */
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:rgba(13,18,32,0.9);border:1px solid rgba(0,229,255,0.3);border-radius:10px;
+  padding:12px 20px;z-index:500;font-size:14px;opacity:0;transition:all 0.3s;
+  backdrop-filter:blur(10px);pointer-events:none;max-width:90vw;text-align:center;color:#e2e8f0}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#toast.error{border-color:var(--danger);color:var(--danger)}
-#toast.success{border-color:var(--success);color:var(--success)}
-#toast.warn{border-color:var(--warn);color:var(--warn)}
-#connStatus{position:fixed;top:12px;left:12px;padding:6px 12px;background:rgba(13,18,32,0.9);border:1px solid var(--border);
-  border-radius:20px;font-size:11px;z-index:90;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)}
-#connStatus::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn)}
-#connStatus.online::before{background:var(--success);box-shadow:0 0 6px var(--success)}
-#connStatus.offline::before{background:var(--danger);box-shadow:0 0 6px var(--danger)}
-
-@media(max-width:600px){
-  .menu-title{letter-spacing:.1em}
-  .menu-btn{padding:14px 20px;font-size:15px}
-  .op-container{padding:14px 0}
-  .lock-container{padding:22px 18px}
-  .pin-pad button{font-size:20px}
-}
+#toast.error{border-color:#ef4444;color:#ef4444}
+#toast.success{border-color:#10b981;color:#10b981}
+#toast.warn{border-color:#f59e0b;color:#f59e0b}
+#connStatus{position:fixed;top:12px;left:12px;padding:6px 12px;background:rgba(13,18,32,0.9);
+  border:1px solid rgba(0,229,255,0.25);border-radius:10px;font-size:11px;z-index:90;
+  display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px)}
+#connStatus::before{content:'';width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 6px #f59e0b}
+#connStatus.online::before{background:#10b981;box-shadow:0 0 6px #10b981}
+#connStatus.offline::before{background:#ef4444;box-shadow:0 0 6px #ef4444}
 </style>
 </head>
 <body>
@@ -247,168 +285,126 @@ body.editor-mode .touch-btn .resize-handle{position:absolute;bottom:-8px;right:-
     <h3 id="uTitle">اسم اللاعب</h3>
     <p id="uDesc">أدخل اسمك للبدء</p>
     <input type="text" id="uInput" maxlength="16" autocomplete="off">
-    <div class="dialog-actions">
-      <button class="btn primary" id="uContinue">متابعة</button>
-    </div>
+    <div class="dialog-actions"><button class="btn primary" id="uContinue">متابعة</button></div>
   </div>
 </div>
 
-<!-- MAIN MENU WITH 3D PREVIEW -->
 <div id="mainMenu" class="screen">
   <canvas id="previewCanvas"></canvas>
   <div class="menu-content">
     <div class="menu-title">ARENA</div>
-    <div class="menu-subtitle">MINECRAFT · LIVE</div>
+    <div class="menu-subtitle">MINECRAFT · LIVE · MULTIPLAYER</div>
     <div class="menu-buttons">
-      <button class="menu-btn" data-action="single">🎮 <span data-i18n="single">لاعب واحد</span></button>
-      <button class="menu-btn" data-action="live">🌐 <span data-i18n="live">انضمام مباشر</span></button>
-      <button class="menu-btn" data-action="options">⚙️ <span data-i18n="options">الإعدادات</span></button>
-      <button class="menu-btn" data-action="operator">🛡️ <span data-i18n="operator">قائمة المشرف</span></button>
+      <button class="menu-btn" data-action="single">🎮 <span>لاعب واحد</span></button>
+      <button class="menu-btn" data-action="live">🌐 <span>انضمام مباشر</span></button>
+      <button class="menu-btn" data-action="options">⚙️ <span>الإعدادات</span></button>
+      <button class="menu-btn" data-action="operator">🛡️ <span>قائمة المشرف</span></button>
     </div>
   </div>
-  <div class="menu-version">v2.0 · MINECRAFT EDITION</div>
+  <div class="menu-version">v3.0 · MINECRAFT EDITION</div>
 </div>
 
-<!-- OPTIONS -->
 <div id="options" class="screen">
   <div class="options-container">
     <div class="options-header">
-      <button class="btn small" id="optBack">← <span data-i18n="back">رجوع</span></button>
-      <h2 data-i18n="options">الإعدادات</h2>
-      <button class="btn small danger" id="optReset"><span data-i18n="reset">إعادة تعيين</span></button>
+      <button class="btn small" id="optBack">← رجوع</button>
+      <h2>الإعدادات</h2>
+      <button class="btn small danger" id="optReset">إعادة تعيين</button>
     </div>
     <div class="option-section">
       <div class="option-row">
-        <div><div class="option-label" data-i18n="language">اللغة</div><div class="option-desc">Language</div></div>
-        <select class="sel" id="optLang">
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-        </select>
+        <div><div class="option-label">اللغة</div><div class="option-desc">Language</div></div>
+        <select class="sel" id="optLang"><option value="ar">العربية</option><option value="en">English</option></select>
       </div>
       <div class="option-row">
-        <div><div class="option-label" data-i18n="pov">زاوية الرؤية (POV)</div><div class="option-desc">Field of View</div></div>
+        <div><div class="option-label">زاوية الرؤية (POV)</div><div class="option-desc">Field of View</div></div>
         <div class="slider-wrap"><input type="range" id="optPov" min="60" max="110" step="1"><span class="slider-value" id="optPovVal">75</span></div>
       </div>
       <div class="option-row">
-        <div><div class="option-label" data-i18n="gyro">الجيروسكوب</div><div class="option-desc">Gyroscope</div></div>
+        <div><div class="option-label">الجيروسكوب</div><div class="option-desc">Gyroscope</div></div>
         <div class="toggle" id="optGyro"></div>
       </div>
     </div>
     <div class="option-section">
       <div class="option-row">
-        <div><div class="option-label" data-i18n="camSpeedPC">سرعة الكاميرا - كمبيوتر</div><div class="option-desc">Camera Speed (PC)</div></div>
+        <div><div class="option-label">سرعة الكاميرا - كمبيوتر</div><div class="option-desc">Camera Speed (PC)</div></div>
         <div class="slider-wrap"><input type="range" id="optCamPC" min="0.2" max="3" step="0.1"><span class="slider-value" id="optCamPCVal">1.0x</span></div>
       </div>
       <div class="option-row">
-        <div><div class="option-label" data-i18n="camSpeedMobile">سرعة الكاميرا - جوال</div><div class="option-desc">Camera Speed (Mobile)</div></div>
+        <div><div class="option-label">سرعة الكاميرا - جوال</div><div class="option-desc">Camera Speed (Mobile)</div></div>
         <div class="slider-wrap"><input type="range" id="optCamMobile" min="0.2" max="3" step="0.1"><span class="slider-value" id="optCamMobileVal">1.0x</span></div>
       </div>
-      <div class="option-row">
-        <div><div class="option-label" data-i18n="editTouchMenu">تعديل قائمة اللمس</div><div class="option-desc">Edit Touch Menu</div></div>
-        <button class="btn primary" id="optEditTouch">تعديل</button>
-      </div>
     </div>
   </div>
 </div>
 
-<!-- TOUCH EDITOR -->
-<div class="editor-overlay" id="editorOverlay"></div>
-<div class="editor-topbar" id="editorTopbar">
-  <button class="btn small" id="edBack">← <span data-i18n="backToOptions">رجوع للإعدادات</span></button>
-  <div class="editor-info" id="edInfo">اختر زراً لتعديله</div>
-  <button class="btn small danger" id="edReset"><span data-i18n="reset">إعادة تعيين</span></button>
-</div>
-<div class="editor-bottom" id="editorBottom">
-  <div class="editor-control">
-    <label><span data-i18n="touchOpacity">الشفافية</span><span id="edOpacityVal">85%</span></label>
-    <input type="range" id="edOpacity" min="20" max="100" step="1" value="85">
-  </div>
-  <div class="editor-control">
-    <label><span data-i18n="touchSize">الحجم</span><span id="edSizeVal">60px</span></label>
-    <input type="range" id="edSize" min="40" max="100" step="2" value="60">
-  </div>
-</div>
-
-<!-- GAME -->
 <div id="game" class="screen">
   <canvas id="gameCanvas"></canvas>
-  <div id="hud">
+  <div id="crosshair">+</div>
+  <div id="hudTop">
     <div id="hudInfo"></div>
-    <div id="touchMenu">
-      <button class="touch-btn" data-tb="chat" title="Chat">💬</button>
-      <button class="touch-btn" data-tb="menu" title="Menu">☰</button>
-      <button class="touch-btn" data-tb="players" title="Players">👥</button>
+    <div id="topButtons">
+      <button class="icon-btn" id="btnInventory">🎒</button>
+      <button class="icon-btn" id="btnChat">💬</button>
+      <button class="icon-btn" id="btnPlayers">👥</button>
+      <button class="icon-btn" id="btnMenu">☰</button>
     </div>
   </div>
+  <div id="joystick"><div id="joystickKnob"></div></div>
+  <div id="gameActions">
+    <button class="action-btn jump" id="btnJump">⬆</button>
+    <button class="action-btn break" id="btnBreak">⛏</button>
+    <button class="action-btn place" id="btnPlace">⬛</button>
+  </div>
+  <div id="hotbar"></div>
 </div>
 
-<!-- CHAT -->
 <div id="chatPanel">
-  <div class="chat-header">
-    <span data-i18n="chat">الدردشة</span>
-    <button class="btn small" id="chatClose">✕</button>
-  </div>
+  <div class="chat-header"><span>الدردشة</span><button class="btn small" id="chatClose">✕</button></div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
     <input type="text" id="chatInput" maxlength="200" placeholder="اكتب رسالة...">
-    <button id="chatSend" data-i18n="send">إرسال</button>
+    <button id="chatSend">إرسال</button>
   </div>
 </div>
 
-<!-- ADMIN LOCK -->
 <div id="adminLock" class="screen">
   <div class="lock-container">
     <div class="lock-icon">🔒</div>
-    <h2 data-i18n="adminLock">قفل المشرف</h2>
-    <div class="lock-sub" data-i18n="adminLockSub">أدخل رمز الحماية</div>
+    <h2>قفل المشرف</h2>
+    <div class="lock-sub">أدخل رمز الحماية</div>
     <div class="pin-display" id="pinDisplay">
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
     <div class="pin-pad">
-      <button data-pin="1">1</button>
-      <button data-pin="2">2</button>
-      <button data-pin="3">3</button>
-      <button data-pin="4">4</button>
-      <button data-pin="5">5</button>
-      <button data-pin="6">6</button>
-      <button data-pin="7">7</button>
-      <button data-pin="8">8</button>
-      <button data-pin="9">9</button>
-      <button data-pin="clear" class="fn">✕</button>
-      <button data-pin="0">0</button>
-      <button data-pin="back" class="fn">⌫</button>
+      <button data-pin="1">1</button><button data-pin="2">2</button><button data-pin="3">3</button>
+      <button data-pin="4">4</button><button data-pin="5">5</button><button data-pin="6">6</button>
+      <button data-pin="7">7</button><button data-pin="8">8</button><button data-pin="9">9</button>
+      <button data-pin="clear" class="fn">✕</button><button data-pin="0">0</button><button data-pin="back" class="fn">⌫</button>
     </div>
-    <button class="lock-exit-btn" id="lockExit">
-      <span data-i18n="exit">خروج</span>
-      <span class="exit-pin">19132</span>
-    </button>
+    <button class="lock-exit-btn" id="lockExit"><span>خروج</span><span class="exit-pin">19132</span></button>
     <div class="lock-error" id="lockError"></div>
   </div>
 </div>
 
-<!-- OPERATOR -->
 <div id="operator" class="screen">
   <div class="op-container">
     <div class="op-header">
-      <button class="btn small" id="opBack">← <span data-i18n="back">رجوع</span></button>
-      <h2 data-i18n="operator">قائمة المشرف</h2>
+      <button class="btn small" id="opBack">← رجوع</button>
+      <h2>قائمة المشرف</h2>
       <div class="admin-badge" id="opAdminBadge">ADMIN</div>
     </div>
-    <div class="op-note" data-i18n="opNote">وضع تجريبي - كل الميزات متاحة</div>
+    <div class="op-note">وضع إداري — كل الميزات متاحة</div>
     <div class="op-tabs">
-      <button class="op-tab active" data-opTab="players" data-i18n="players">اللاعبون</button>
-      <button class="op-tab" data-opTab="messages" data-i18n="chat">الدردشة</button>
+      <button class="op-tab active" data-opTab="players">اللاعبون</button>
+      <button class="op-tab" data-opTab="messages">الدردشة</button>
     </div>
     <div class="op-panel active" id="opPlayers"></div>
     <div class="op-panel" id="opMessages"></div>
   </div>
 </div>
 
-<!-- CONFIRM DIALOG -->
 <div class="overlay" id="confirmOverlay">
   <div class="dialog">
     <h3 id="confirmTitle">تأكيد</h3>
@@ -421,9 +417,19 @@ body.editor-mode .touch-btn .resize-handle{position:absolute;bottom:-8px;right:-
   </div>
 </div>
 
-<!-- BAN SCREEN -->
+<div class="overlay" id="inventoryOverlay">
+  <div class="dialog" style="max-width:520px">
+    <h3>المخزون الإبداعي</h3>
+    <p>اختر بلوك لوضعه في الشريط السريع</p>
+    <div class="inv-grid" id="invGrid"></div>
+    <div class="dialog-actions">
+      <button class="btn" id="invClose">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <div id="banScreen" class="screen">
-  <h1 data-i18n="youAreBanned">أنت محظور</h1>
+  <h1>أنت محظور</h1>
   <div class="ban-info" id="banInfo"></div>
   <button class="btn" id="banExit">خروج</button>
 </div>
@@ -449,76 +455,188 @@ const SUPABASE_KEY = 'sb_publishable_JAqBDsF961c8tTopO_CLnQ_KVB7ZjSm';
 const ADMIN_USERNAME = 'sqqdask';
 const ADMIN_PIN = '19132';
 
-/* ============ I18N ============ */
-const LANGS = {
-  ar: { dir:'rtl',
-    single:'لاعب واحد', live:'انضمام مباشر', options:'الإعدادات', operator:'قائمة المشرف',
-    username:'اسم اللاعب', enterName:'أدخل اسمك للبدء', continue:'متابعة', back:'رجوع',
-    backToOptions:'رجوع للإعدادات', reset:'إعادة تعيين',
-    resetConfirm:'هل أنت متأكد من إعادة تعيين كل الإعدادات؟', resetConfirmBtn:'نعم، أعد التعيين',
-    cancel:'إلغاء', pov:'زاوية الرؤية (POV)', gyro:'الجيروسكوب', language:'اللغة',
-    camSpeedPC:'سرعة الكاميرا - كمبيوتر', camSpeedMobile:'سرعة الكاميرا - جوال',
-    editTouchMenu:'تعديل قائمة اللمس', touchOpacity:'الشفافية', touchSize:'الحجم',
-    chat:'الدردشة', send:'إرسال', players:'اللاعبون', online:'متصل',
-    ban:'حظر', warn:'تحذير', delete:'حذف', banDuration:'مدة الحظر (دقيقة)', reason:'السبب',
-    youAreBanned:'أنت محظور', bannedUntil:'محظور حتى', exit:'خروج',
-    noMessages:'لا توجد رسائل بعد', opNote:'وضع تجريبي - كل الميزات متاحة',
-    singleMode:'لاعب واحد - بدون دردشة', confirmDelete:'حذف هذه الرسالة؟', confirmBan:'حظر هذا اللاعب؟',
-    confirmWarn:'تحذير هذا اللاعب؟', selectButton:'اختر زراً لتعديله', you:'أنت',
-    chatOnlyLive:'الدردشة متاحة فقط في الانضمام المباشر', chatPlaceholder:'اكتب رسالة...',
-    banned:'تم الحظر', warned:'تم التحذير', deleted:'تم الحذف', enterName2:'الرجاء إدخال اسمك',
-    backToMenu:'القائمة الرئيسية', resume:'متابعة', pause:'إيقاف مؤقت',
-    connecting:'جاري الاتصال...', online2:'متصل', testMode:'وضع تجريبي',
-    adminLock:'قفل المشرف', adminLockSub:'أدخل رمز الحماية', adminOnly:'للمشرف فقط',
-    wrongPin:'رمز خاطئ', accessDenied:'هذه المنطقة محمية'
-  },
-  en: { dir:'ltr',
-    single:'Single Player', live:'Live Join', options:'Options', operator:'Operator',
-    username:'Username', enterName:'Enter your name', continue:'Continue', back:'Back',
-    backToOptions:'Back to Options', reset:'Reset',
-    resetConfirm:'Reset all settings?', resetConfirmBtn:'Yes, reset',
-    cancel:'Cancel', pov:'Field of View', gyro:'Gyroscope', language:'Language',
-    camSpeedPC:'Camera Speed - PC', camSpeedMobile:'Camera Speed - Mobile',
-    editTouchMenu:'Edit Touch Menu', touchOpacity:'Opacity', touchSize:'Size',
-    chat:'Chat', send:'Send', players:'Players', online:'Online',
-    ban:'Ban', warn:'Warn', delete:'Delete', banDuration:'Ban Duration (min)', reason:'Reason',
-    youAreBanned:'You are banned', bannedUntil:'Banned until', exit:'Exit',
-    noMessages:'No messages yet', opNote:'Test mode - all features available',
-    singleMode:'Single Player - no chat', confirmDelete:'Delete this message?', confirmBan:'Ban this player?',
-    confirmWarn:'Warn this player?', selectButton:'Select a button to edit', you:'You',
-    chatOnlyLive:'Chat is only available in Live Join', chatPlaceholder:'Type a message...',
-    banned:'Banned', warned:'Warned', deleted:'Deleted', enterName2:'Please enter your name',
-    backToMenu:'Main Menu', resume:'Resume', pause:'Paused',
-    connecting:'Connecting...', online2:'Online', testMode:'Test Mode',
-    adminLock:'Admin Lock', adminLockSub:'Enter protection code', adminOnly:'Admin only',
-    wrongPin:'Wrong code', accessDenied:'Protected area'
-  }
+/* ============ BLOCK TYPES ============ */
+const BLOCK_TYPES = {
+  grass:    { top:0x6cc24a, side:0x8b6a3a, bottom:0x8b6a3a, css:'#7cb342', name:'عشب' },
+  dirt:     { top:0x8b6a3a, side:0x8b6a3a, bottom:0x8b6a3a, css:'#8b6a3a', name:'تراب' },
+  stone:    { top:0x888888, side:0x888888, bottom:0x888888, css:'#888888', name:'حجر' },
+  bedrock:  { top:0x222222, side:0x222222, bottom:0x222222, css:'#222222', name:'بيدروك', unbreakable:true },
+  cobble:   { top:0x666666, side:0x666666, bottom:0x666666, css:'#666666', name:'كوبل' },
+  wood:     { top:0x8b5a2b, side:0x8b5a2b, bottom:0x8b5a2b, css:'#8b5a2b', name:'خشب' },
+  leaves:   { top:0x2d8a2d, side:0x2d8a2d, bottom:0x2d8a2d, css:'#2d8a2d', name:'أوراق' },
+  sand:     { top:0xf5deb3, side:0xf5deb3, bottom:0xf5deb3, css:'#f5deb3', name:'رمل' },
+  brick:    { top:0xb22222, side:0xb22222, bottom:0xb22222, css:'#b22222', name:'طوب' },
+  glass:    { top:0xadd8e6, side:0xadd8e6, bottom:0xadd8e6, css:'#add8e6', name:'زجاج', transparent:true }
 };
-let T = LANGS.ar;
-const t = k => T[k] || k;
+const INVENTORY_BLOCKS = ['grass','dirt','stone','cobble','wood','leaves','sand','brick','glass'];
+
+/* ============ SETTINGS ============ */
+const DEFAULT_SETTINGS = { lang:'ar', pov:75, gyro:false, camSpeedPC:1, camSpeedMobile:1, username:'' };
+let settings = loadSettings();
+function loadSettings(){ try{ const r=localStorage.getItem('arena_settings'); return r?{...DEFAULT_SETTINGS,...JSON.parse(r)}:{...DEFAULT_SETTINGS}; }catch(e){ return {...DEFAULT_SETTINGS}; } }
+function saveSettings(){ try{ localStorage.setItem('arena_settings', JSON.stringify(settings)); }catch(e){} }
 
 /* ============ STATE ============ */
-const DEFAULT_SETTINGS = { lang:'ar', pov:75, gyro:false, camSpeedPC:1, camSpeedMobile:1, touchButtons:null, username:'' };
-let settings = loadSettings();
 let session = {
   userId:null, username:'', mode:null, supabase:null, channel:null,
-  players:new Map(), messages:[], isAdmin:false, isOperator:false, online:false,
-  camera:null, renderer:null, scene:null, yaw:0, pitch:0, keys:{}, animId:null,
-  dragging:false, lastX:0, lastY:0, botTimers:[], editorSelection:null,
-  deviceOrientationHandler:null, previewRenderer:null, previewScene:null,
-  previewCamera:null, previewAnimId:null, previewActive:false,
-  pinInput:'', banInfo:null
+  online:false, isAdmin:false, isOperator:false,
+  players:new Map(), remotePlayers:new Map(), messages:[],
+  camera:null, renderer:null, scene:null,
+  player:{ x:0, y:0.5, z:0, vy:0 },
+  yaw:0, pitch:0, keys:{}, dragging:false, lastX:0, lastY:0,
+  animId:null, editorSelection:null, pinInput:'', banInfo:null,
+  previewRenderer:null, previewScene:null, previewCamera:null, previewAnimId:null, previewActive:false,
+  highlightBox:null, remoteMeshes:new Map(),
+  joyVec:{x:0,y:0}, joystickTouchId:null,
+  lookTouchId:null, onGround:false,
+  hotbarSelected:0, lastBroadcast:0, lastBlockCheck:0,
+  suppressBroadcast:false, sounds:null
 };
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-/* ============ UTILITIES ============ */
-function loadSettings(){ try{ const r=localStorage.getItem('arena_settings'); return r?{...DEFAULT_SETTINGS,...JSON.parse(r)}:{...DEFAULT_SETTINGS}; }catch(e){ return {...DEFAULT_SETTINGS}; } }
-function saveSettings(){ try{ localStorage.setItem('arena_settings', JSON.stringify(settings)); }catch(e){} }
-function saveUserId(id){ try{ localStorage.setItem('arena_uid', id); }catch(e){} }
-function loadUserId(){ try{ return localStorage.getItem('arena_uid'); }catch(e){ return null; } }
-function saveBan(b){ try{ localStorage.setItem('arena_ban', JSON.stringify(b)); }catch(e){} }
-function loadBan(){ try{ const r=localStorage.getItem('arena_ban'); return r?JSON.parse(r):null; }catch(e){ return null; } }
+/* ============ HOTBAR ============ */
+let hotbar = ['grass','dirt','stone','cobble','wood','leaves','sand','brick','glass'];
+
+/* ============ VOXEL WORLD ============ */
+const world = new Map();
+const blockMeshes = {};
+function wkey(x,y,z){ return x+','+y+','+z; }
+function getBlock(x,y,z){ return world.get(wkey(x,y,z)); }
+function hasBlock(x,y,z){ return world.has(wkey(x,y,z)); }
+function setBlock(x,y,z,type,broadcast=true){
+  if(!type || type === 'air'){ world.delete(wkey(x,y,z)); }
+  else world.set(wkey(x,y,z), type);
+  rebuildBlockMeshes();
+  if(broadcast && session.channel && !session.suppressBroadcast){
+    session.channel.send({ type:'broadcast', event:'block',
+      payload:{ x, y, z, type: type || 'air', id: session.userId } }).catch(()=>{});
+  }
+}
+
+/* ============ GEOMETRY HELPERS ============ */
+function makeBlockGeometry(type){
+  const def = BLOCK_TYPES[type] || BLOCK_TYPES.stone;
+  const geo = new THREE.BoxGeometry(1, 1, 1);
+  const colors = new Float32Array(24 * 3);
+  // BoxGeometry face order: +X, -X, +Y, -Y, +Z, -Z
+  const faceColors = [
+    def.side, def.side,    // +X, -X
+    def.top, def.bottom,   // +Y, -Y
+    def.side, def.side     // +Z, -Z
+  ];
+  for(let f = 0; f < 6; f++){
+    const c = new THREE.Color(faceColors[f]);
+    for(let v = 0; v < 4; v++){
+      const i = (f * 4 + v) * 3;
+      colors[i] = c.r; colors[i+1] = c.g; colors[i+2] = c.b;
+    }
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geo;
+}
+
+function rebuildBlockMeshes(){
+  if(!session.scene) return;
+  // Remove old
+  for(const type in blockMeshes){
+    const m = blockMeshes[type];
+    if(m){ session.scene.remove(m); m.geometry.dispose(); m.material.dispose(); }
+    delete blockMeshes[type];
+  }
+  // Group by type
+  const groups = {};
+  for(const [k, type] of world){
+    if(!groups[type]) groups[type] = [];
+    const [x, y, z] = k.split(',').map(Number);
+    groups[type].push([x, y, z]);
+  }
+  // Create meshes
+  for(const type in groups){
+    const positions = groups[type];
+    const def = BLOCK_TYPES[type];
+    if(!def) continue;
+    const geo = makeBlockGeometry(type);
+    const mat = new THREE.MeshLambertMaterial({
+      vertexColors: true,
+      transparent: !!def.transparent,
+      opacity: def.transparent ? 0.6 : 1
+    });
+    const mesh = new THREE.InstancedMesh(geo, mat, positions.length);
+    const dummy = new THREE.Object3D();
+    positions.forEach(([x, y, z], i) => {
+      dummy.position.set(x, y, z);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    session.scene.add(mesh);
+    blockMeshes[type] = mesh;
+  }
+}
+
+/* ============ ISLAND GENERATION ============ */
+function generateIsland(){
+  world.clear();
+  const radius = 8;
+  for(let x = -radius; x <= radius; x++){
+    for(let z = -radius; z <= radius; z++){
+      if(x*x + z*z > radius*radius) continue;
+      world.set(wkey(x, 0, z), 'grass');
+      world.set(wkey(x, -1, z), 'dirt');
+      world.set(wkey(x, -2, z), 'dirt');
+      world.set(wkey(x, -3, z), 'stone');
+      world.set(wkey(x, -4, z), 'stone');
+      world.set(wkey(x, -5, z), 'stone');
+      world.set(wkey(x, -6, z), 'bedrock');
+    }
+  }
+  // Add a couple decorative trees
+  addTree(4, 0, 3);
+  addTree(-4, 0, -3);
+}
+function addTree(x, y, z){
+  for(let i = 1; i <= 3; i++) world.set(wkey(x, y+i, z), 'wood');
+  for(let dx = -1; dx <= 1; dx++){
+    for(let dz = -1; dz <= 1; dz++){
+      if(dx === 0 && dz === 0) continue;
+      world.set(wkey(x+dx, y+3, z+dz), 'leaves');
+    }
+  }
+  for(let dx = -1; dx <= 1; dx++){
+    for(let dz = -1; dz <= 1; dz++){
+      world.set(wkey(x+dx, y+4, z+dz), 'leaves');
+    }
+  }
+  world.set(wkey(x, y+5, z), 'leaves');
+}
+
+/* ============ COLLISION ============ */
+function collides(px, py, pz){
+  const minBx = Math.floor(px - 0.8) + 1;
+  const maxBx = Math.ceil(px + 0.8) - 1;
+  const minBy = Math.floor(py - 0.5) + 1;
+  const maxBy = Math.ceil(py + 2.3) - 1;
+  const minBz = Math.floor(pz - 0.8) + 1;
+  const maxBz = Math.ceil(pz + 0.8) - 1;
+  for(let bx = minBx; bx <= maxBx; bx++)
+    for(let by = minBy; by <= maxBy; by++)
+      for(let bz = minBz; bz <= maxBz; bz++)
+        if(world.has(wkey(bx, by, bz))) return true;
+  return false;
+}
+function isOnGround(px, py, pz){ return collides(px, py - 0.08, pz); }
+
+/* ============ I18N ============ */
+const LANGS = {
+  ar:{ online:'متصل', testMode:'وضع تجريبي', singlePlayer:'لاعب واحد', liveJoin:'انضمام مباشر',
+       chat:'الدردشة', players:'اللاعبون', inventory:'المخزون الإبداعي', you:'أنت' },
+  en:{ online:'Online', testMode:'Test Mode', singlePlayer:'Single Player', liveJoin:'Live Join',
+       chat:'Chat', players:'Players', inventory:'Creative Inventory', you:'You' }
+};
+const t = k => (LANGS[settings.lang] && LANGS[settings.lang][k]) || k;
+
+/* ============ UI HELPERS ============ */
 function showScreen(id){ $$('.screen').forEach(s => s.classList.remove('active')); if(id) document.getElementById(id).classList.add('active'); }
 function toast(msg, type=''){
   const el = $('#toast'); el.textContent = msg; el.className = 'show ' + type;
@@ -526,7 +644,8 @@ function toast(msg, type=''){
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function now(){ return Date.now(); }
-function formatTime(ts){ const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function formatTime(ts){ const d = new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+
 function confirmDialog(title, text, {yesLabel, noLabel, extra}={}){
   return new Promise(resolve => {
     $('#confirmTitle').textContent = title || 'تأكيد';
@@ -537,7 +656,7 @@ function confirmDialog(title, text, {yesLabel, noLabel, extra}={}){
       inp.type = extra.input.type || 'text';
       inp.placeholder = extra.input.placeholder || '';
       inp.value = extra.input.value || '';
-      if(extra.input.type === 'number'){ inp.min = extra.input.min || 1; inp.max = extra.input.max || 9999; }
+      if(extra.input.type === 'number'){ inp.min = extra.input.min || 1; inp.max = extra.input.max || 99999; }
       extraEl.appendChild(inp); extra.input.ref = inp;
     }
     const ov = $('#confirmOverlay'); ov.classList.add('active');
@@ -547,61 +666,6 @@ function confirmDialog(title, text, {yesLabel, noLabel, extra}={}){
     yes.onclick = () => cleanup(extra && extra.input ? extra.input.ref.value : true);
     no.onclick = () => cleanup(false);
     if(extra && extra.input && extra.input.ref) setTimeout(() => extra.input.ref.focus(), 100);
-  });
-}
-function applyI18n(){
-  document.documentElement.lang = settings.lang;
-  document.documentElement.dir = T.dir;
-  $$('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if(T[k]) el.textContent = T[k]; });
-  $$('[data-i18n-placeholder]').forEach(el => { const k = el.getAttribute('data-i18n-placeholder'); if(T[k]) el.placeholder = T[k]; });
-  $('#uTitle').textContent = t('username');
-  $('#uDesc').textContent = t('enterName');
-  $('#uContinue').textContent = t('continue');
-  $('#loading .label').textContent = t('connecting');
-  const ci = $('#chatInput'); if(ci) ci.placeholder = t('chatPlaceholder');
-}
-
-/* ============ TOUCH BUTTONS ============ */
-function initTouchButtons(){
-  if(settings.touchButtons) return;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  settings.touchButtons = {
-    chat:    { x: vw - 80, y: vh - 90, w: 60, h: 60, opacity: 0.85 },
-    menu:    { x: 20,      y: vh - 90, w: 60, h: 60, opacity: 0.85 },
-    players: { x: vw - 80, y: 20,      w: 60, h: 60, opacity: 0.85 }
-  };
-  saveSettings();
-}
-function getTouchButtons(){ initTouchButtons(); return settings.touchButtons; }
-function renderTouchButtons(container){
-  const btns = getTouchButtons();
-  const vw = window.innerWidth, vh = window.innerHeight;
-  Object.entries(btns).forEach(([name, b]) => {
-    let el = container.querySelector(`[data-tb="${name}"]`);
-    if(!el){
-      el = document.createElement('button');
-      el.className = 'touch-btn'; el.dataset.tb = name;
-      el.textContent = name === 'chat' ? '💬' : name === 'menu' ? '☰' : '👥';
-      container.appendChild(el);
-    }
-    const bx = Math.max(0, Math.min(b.x, vw - b.w));
-    const by = Math.max(0, Math.min(b.y, vh - b.h));
-    el.style.left = bx + 'px'; el.style.top = by + 'px';
-    el.style.width = b.w + 'px'; el.style.height = b.h + 'px';
-    el.style.opacity = b.opacity;
-  });
-}
-function bindTouchButtonActions(){
-  $$('#touchMenu .touch-btn').forEach(el => {
-    el.onclick = e => {
-      e.stopPropagation();
-      const name = el.dataset.tb;
-      if(name === 'chat'){
-        if(session.mode !== 'live'){ toast(t('chatOnlyLive'), 'warn'); return; }
-        toggleChat();
-      } else if(name === 'menu') openPauseMenu();
-      else if(name === 'players') openPlayersModal();
-    };
   });
 }
 
@@ -617,33 +681,73 @@ async function initSupabase(){
       session.userId = data.user.id;
     } else session.userId = ss.user.id;
     session.online = true;
-    $('#connStatus').textContent = t('online2');
+    $('#connStatus').textContent = 'متصل';
     $('#connStatus').className = 'online';
-    saveUserId(session.userId);
+    try{ localStorage.setItem('arena_uid', session.userId); }catch(e){}
   } catch(err){
     console.warn('Supabase failed:', err);
     session.online = false;
-    session.userId = loadUserId() || ('local_' + Math.random().toString(36).slice(2,10));
-    saveUserId(session.userId);
-    $('#connStatus').textContent = t('testMode');
+    session.userId = localStorage.getItem('arena_uid') || ('local_' + Math.random().toString(36).slice(2,10));
+    try{ localStorage.setItem('arena_uid', session.userId); }catch(e){}
+    $('#connStatus').textContent = 'وضع تجريبي';
     $('#connStatus').className = 'offline';
   }
 }
+
 async function joinLiveChannel(){
-  if(!session.online || !session.supabase){ startSimulation(); return; }
+  if(!session.online || !session.supabase){
+    toast('وضع تجريبي — لا يوجد اتصال حقيقي', 'warn');
+    updateHudInfo();
+    return;
+  }
   try{
     const channel = session.supabase.channel('arena_global', {
       config: { presence: { key: session.userId }, broadcast: { self: true } }
     });
     session.channel = channel;
+
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState();
       session.players.clear();
       Object.entries(state).forEach(([k, arr]) => arr.forEach(p => {
         session.players.set(p.user_id, { id: p.user_id, name: p.name, joined: p.joined || now() });
       }));
-      renderPlayersList(); updateHudInfo();
+      // Remove disconnected remote meshes
+      for(const [id, mesh] of session.remoteMeshes){
+        if(!session.players.has(id)){
+          session.scene.remove(mesh.group);
+          session.remoteMeshes.delete(id);
+        }
+      }
+      updateHudInfo();
+      renderOperatorPlayers();
     });
+
+    channel.on('broadcast', { event: 'player' }, ({ payload }) => {
+      if(payload.id === session.userId) return;
+      let p = session.remotePlayers.get(payload.id);
+      if(!p){
+        p = { targetX: payload.x, targetY: payload.y, targetZ: payload.z,
+              targetYaw: payload.yaw, targetPitch: payload.pitch,
+              name: payload.name || 'Player', currentX: payload.x, currentY: payload.y, currentZ: payload.z };
+        session.remotePlayers.set(payload.id, p);
+        createRemotePlayer(payload.id, p);
+      }
+      p.targetX = payload.x; p.targetY = payload.y; p.targetZ = payload.z;
+      p.targetYaw = payload.yaw; p.targetPitch = payload.pitch;
+    });
+
+    channel.on('broadcast', { event: 'leave' }, ({ payload }) => {
+      removeRemotePlayer(payload.id);
+    });
+
+    channel.on('broadcast', { event: 'block' }, ({ payload }) => {
+      if(payload.id === session.userId) return;
+      session.suppressBroadcast = true;
+      setBlock(payload.x, payload.y, payload.z, payload.type === 'air' ? null : payload.type, false);
+      session.suppressBroadcast = false;
+    });
+
     channel.on('broadcast', { event: 'chat' }, ({ payload }) => {
       if(payload.type === 'message'){
         session.messages.push({ id: payload.id, authorId: payload.authorId, author: payload.author,
@@ -656,110 +760,654 @@ async function joinLiveChannel(){
       } else if(payload.type === 'ban' && payload.targetId === session.userId){
         applyBan({ until: payload.until, reason: payload.reason, by: payload.by });
       } else if(payload.type === 'warn' && payload.targetId === session.userId){
-        toast(t('warn') + ': ' + (payload.reason || ''), 'warn');
+        toast('تحذير: ' + (payload.reason || ''), 'warn');
       }
     });
+
     await channel.subscribe(async status => {
-      if(status === 'SUBSCRIBED') await channel.track({ user_id: session.userId, name: session.username, joined: now() });
+      if(status === 'SUBSCRIBED'){
+        await channel.track({ user_id: session.userId, name: session.username, joined: now() });
+        toast('متصل بالخادم ✓', 'success');
+      }
     });
-  } catch(err){ console.warn('Channel failed:', err); startSimulation(); }
-}
-function startSimulation(){
-  session.online = false;
-  $('#connStatus').textContent = t('testMode');
-  $('#connStatus').className = 'offline';
-  ['Ali_X','Sara_Pro','Omar_King','Noor_Ninja'].forEach((n,i) =>
-    session.players.set('bot_'+i, { id:'bot_'+i, name:n, joined:now(), isBot:true })
-  );
-  renderPlayersList(); updateHudInfo();
-  [['Ali_X','السلام عليكم'],['Sara_Pro','Hi everyone!'],['Omar_King','من جاهز؟'],['Noor_Ninja','gg let\'s go']]
-    .forEach(([n,txt],i) => setTimeout(() => {
-      session.messages.push({ id:'sim_'+i, authorId:'bot_'+(i%4), author:n, text:txt, ts:now()-(4-i)*60000, deleted:false });
-      renderChat(); renderOperatorMessages();
-    }, 800 + i * 1200));
-  const msgs = ['من يريد اللعب؟','هيا بنا!','لحظة','جيد جداً','😂','🔥','استعد'];
-  const timer = setInterval(() => {
-    if(session.mode !== 'live') return;
-    const bots = [...session.players.values()].filter(p => p.isBot);
-    if(!bots.length) return;
-    const bot = bots[Math.floor(Math.random()*bots.length)];
-    session.messages.push({ id:'sim_'+now(), authorId:bot.id, author:bot.name,
-      text:msgs[Math.floor(Math.random()*msgs.length)], ts:now(), deleted:false });
-    if(session.messages.length > 100) session.messages.shift();
-    renderChat(); renderOperatorMessages();
-  }, 15000);
-  session.botTimers.push(timer);
-}
-async function sendChat(text){
-  if(session.mode !== 'live'){ toast(t('chatOnlyLive'), 'warn'); return; }
-  if(!text.trim()) return;
-  const msg = { id:'m_'+session.userId+'_'+now(), authorId:session.userId, author:session.username,
-    text:text.trim(), ts:now(), deleted:false };
-  session.messages.push(msg);
-  if(session.messages.length > 100) session.messages.shift();
-  renderChat(); renderOperatorMessages();
-  if(session.channel){
-    try{ await session.channel.send({ type:'broadcast', event:'chat', payload:{ type:'message', ...msg } }); }catch(e){}
+  } catch(err){
+    console.warn('Channel failed:', err);
+    toast('فشل الاتصال — وضع تجريبي', 'warn');
   }
-}
-async function deleteMsg(msg){
-  msg.deleted = true; renderChat(); renderOperatorMessages();
-  if(session.channel){
-    try{ await session.channel.send({ type:'broadcast', event:'chat', payload:{ type:'delete', id: msg.id } }); }catch(e){}
-  }
-  toast(t('deleted'), 'success');
-}
-async function banPlayer(player, minutes, reason){
-  const until = now() + minutes * 60000;
-  if(session.channel){
-    try{ await session.channel.send({ type:'broadcast', event:'chat',
-      payload:{ type:'ban', targetId: player.id, until, reason, by: session.username } }); }catch(e){}
-  }
-  if(player.id === session.userId) applyBan({ until, reason, by: session.username });
-  toast(t('banned') + ': ' + player.name, 'success');
-}
-async function warnPlayer(player, reason){
-  if(session.channel){
-    try{ await session.channel.send({ type:'broadcast', event:'chat',
-      payload:{ type:'warn', targetId: player.id, reason, by: session.username } }); }catch(e){}
-  }
-  toast(t('warned') + ': ' + player.name, 'warn');
-}
-function applyBan(info){
-  saveBan(info);
-  if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} }
-  leaveGame();
-  session.banInfo = info;
-  showScreen('banScreen'); renderBanScreen();
-}
-function renderBanScreen(){
-  const info = session.banInfo; if(!info) return;
-  const remaining = Math.max(0, info.until - now());
-  const mins = Math.floor(remaining / 60000);
-  const secs = Math.floor((remaining % 60000) / 1000);
-  $('#banInfo').innerHTML = `
-    <div class="row"><span>${t('bannedUntil')}</span><span class="countdown">${mins}:${secs.toString().padStart(2,'0')}</span></div>
-    <div class="row"><span>${t('reason')}</span><span>${escapeHtml(info.reason || '-')}</span></div>
-    <div class="row"><span>By</span><span>${escapeHtml(info.by || '-')}</span></div>`;
-  if(remaining <= 0){
-    session.banInfo = null;
-    try{ localStorage.removeItem('arena_ban'); }catch(e){}
-    showScreen('mainMenu'); startPreview();
-  } else setTimeout(renderBanScreen, 1000);
-}
-function checkBan(){
-  const info = loadBan();
-  if(info && info.until > now()){ session.banInfo = info; showScreen('banScreen'); renderBanScreen(); return true; }
-  if(info) try{ localStorage.removeItem('arena_ban'); }catch(e){}
-  return false;
 }
 
-/* ============ CHAT UI ============ */
-function toggleChat(){ $('#chatPanel').classList.toggle('open'); if($('#chatPanel').classList.contains('open')) renderChat(); }
+function createRemotePlayer(id, p){
+  const group = new THREE.Group();
+  // Body
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.6, 0.9, 0.3),
+    new THREE.MeshLambertMaterial({ color: 0x00b8cc })
+  );
+  body.position.y = 0.9;
+  group.add(body);
+  // Head
+  const head = new THREE.Mesh(
+    new THREE.BoxGeometry(0.5, 0.5, 0.5),
+    new THREE.MeshLambertMaterial({ color: 0xf4c68a })
+  );
+  head.position.y = 1.6;
+  group.add(head);
+  // Legs
+  const legMat = new THREE.MeshLambertMaterial({ color: 0x2244aa });
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.9, 0.3), legMat);
+  legL.position.set(-0.15, 0.45, 0);
+  group.add(legL);
+  const legR = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.9, 0.3), legMat);
+  legR.position.set(0.15, 0.45, 0);
+  group.add(legR);
+  // Name tag
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(0, 0, 256, 64);
+  ctx.fillStyle = '#00e5ff';
+  ctx.font = 'bold 32px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(p.name, 128, 34);
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(2, 0.5, 1);
+  sprite.position.y = 2.2;
+  group.add(sprite);
+  group.position.set(p.currentX, p.currentY, p.currentZ);
+  session.scene.add(group);
+  session.remoteMeshes.set(id, { group, body, head, legL, legR });
+}
+function removeRemotePlayer(id){
+  session.remotePlayers.delete(id);
+  const m = session.remoteMeshes.get(id);
+  if(m){ session.scene.remove(m.group); session.remoteMeshes.delete(id); }
+}
+
+/* ============ PREVIEW (MENU BACKGROUND) ============ */
+function startPreview(){
+  if(session.previewActive) return;
+  session.previewActive = true;
+  const canvas = $('#previewCanvas');
+  if(!canvas) return;
+  const w = window.innerWidth, h = window.innerHeight;
+  canvas.width = w; canvas.height = h;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h, false);
+  session.previewRenderer = renderer;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
+  scene.fog = new THREE.Fog(0x87ceeb, 60, 150);
+  session.previewScene = scene;
+
+  // Sky gradient
+  const skyGeo = new THREE.SphereGeometry(300, 16, 8);
+  const skyMat = new THREE.ShaderMaterial({
+    uniforms:{ topColor:{value:new THREE.Color(0x3a7bd5)}, bottomColor:{value:new THREE.Color(0xd4f0ff)} },
+    vertexShader:`varying vec3 vW; void main(){ vW = (modelMatrix*vec4(position,1.0)).xyz; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`uniform vec3 topColor; uniform vec3 bottomColor; varying vec3 vW; void main(){ float h = normalize(vW).y; gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h,0.0),0.8),0.0)),1.0); }`,
+    side: THREE.BackSide, depthWrite: false
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const sun = new THREE.DirectionalLight(0xfff4d6, 1.2);
+  sun.position.set(50, 100, 30); scene.add(sun);
+
+  // Ground
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300),
+    new THREE.MeshLambertMaterial({ color: 0x5cb85c }));
+  ground.rotation.x = -Math.PI/2; scene.add(ground);
+
+  // Some decorative blocks
+  const rng = (a,b) => a + Math.random()*(b-a);
+  for(let i = 0; i < 40; i++){
+    const x = rng(-20, 20), z = rng(-20, 20);
+    const h = Math.floor(rng(1, 5));
+    for(let y = 0; y < h; y++){
+      const geo = new THREE.BoxGeometry(1, 1, 1);
+      const isTop = y === h - 1;
+      const color = isTop ? 0x7cb342 : 0x8b6a3a;
+      const mat = new THREE.MeshLambertMaterial({ color });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, y + 0.5, z);
+      scene.add(mesh);
+    }
+  }
+
+  const camera = new THREE.PerspectiveCamera(65, w/h, 0.1, 500);
+  session.previewCamera = camera;
+
+  let time = 0;
+  const animate = () => {
+    if(!session.previewActive) return;
+    session.previewAnimId = requestAnimationFrame(animate);
+    time += 0.008;
+    const r = 26;
+    camera.position.set(Math.cos(time*0.3)*r, 14, Math.sin(time*0.3)*r);
+    camera.lookAt(0, 3, 0);
+    renderer.render(scene, camera);
+  };
+  animate();
+
+  const onResize = () => {
+    if(!session.previewActive) return;
+    const w2 = window.innerWidth, h2 = window.innerHeight;
+    renderer.setSize(w2, h2, false);
+    camera.aspect = w2/h2; camera.updateProjectionMatrix();
+    canvas.style.width = w2 + 'px'; canvas.style.height = h2 + 'px';
+  };
+  window.addEventListener('resize', onResize);
+  session.previewResize = onResize;
+}
+function stopPreview(){
+  session.previewActive = false;
+  if(session.previewAnimId){ cancelAnimationFrame(session.previewAnimId); session.previewAnimId = null; }
+  if(session.previewResize){ window.removeEventListener('resize', session.previewResize); session.previewResize = null; }
+  if(session.previewRenderer){ try{ session.previewRenderer.dispose(); }catch(e){} session.previewRenderer = null; }
+  if(session.previewScene){ session.previewScene.traverse(o => {
+    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
+    if(o.material) try{ o.material.dispose(); }catch(e){}
+  }); session.previewScene = null; }
+  session.previewCamera = null;
+}
+
+/* ============ GAME START/STOP ============ */
+function startGame(mode){
+  if(mode === 'live' && checkBan()) return;
+  stopPreview();
+  session.mode = mode;
+  showScreen('game');
+  initGameScene();
+  updateHudInfo();
+  renderHotbar();
+  if(mode === 'live') joinLiveChannel();
+}
+
+function initGameScene(){
+  const canvas = $('#gameCanvas');
+  const w = window.innerWidth, h = window.innerHeight;
+  canvas.width = w; canvas.height = h;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h, false);
+  renderer.shadowMap.enabled = false;
+  session.renderer = renderer;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
+  scene.fog = new THREE.Fog(0x87ceeb, 80, 200);
+  session.scene = scene;
+
+  // Sky
+  const skyGeo = new THREE.SphereGeometry(300, 16, 8);
+  const skyMat = new THREE.ShaderMaterial({
+    uniforms:{ topColor:{value:new THREE.Color(0x3a7bd5)}, bottomColor:{value:new THREE.Color(0xd4f0ff)} },
+    vertexShader:`varying vec3 vW; void main(){ vW = (modelMatrix*vec4(position,1.0)).xyz; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`uniform vec3 topColor; uniform vec3 bottomColor; varying vec3 vW; void main(){ float h = normalize(vW).y; gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h,0.0),0.8),0.0)),1.0); }`,
+    side: THREE.BackSide, depthWrite: false
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+  const sun = new THREE.DirectionalLight(0xfff4d6, 1.1);
+  sun.position.set(50, 100, 30); scene.add(sun);
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(settings.pov, w/h, 0.1, 500);
+  camera.rotation.order = 'YXZ';
+  session.camera = camera;
+
+  // World
+  generateIsland();
+  rebuildBlockMeshes();
+
+  // Highlight box for looked block
+  const hlGeo = new THREE.BoxGeometry(1.02, 1.02, 1.02);
+  const hlMat = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.5 });
+  const hl = new THREE.Mesh(hlGeo, hlMat);
+  hl.visible = false;
+  scene.add(hl);
+  session.highlightBox = hl;
+
+  // Player
+  session.player = { x: 0, y: 0.5, z: 0, vy: 0 };
+  session.yaw = 0; session.pitch = 0;
+  session.remotePlayers.clear();
+  session.remoteMeshes.clear();
+
+  // Input
+  bindGameInput(canvas);
+  window.addEventListener('resize', onGameResize);
+  session.resizeHandler = onGameResize;
+
+  // Game loop
+  let last = performance.now();
+  const animate = () => {
+    if(!session.renderer) return;
+    session.animId = requestAnimationFrame(animate);
+    const t = performance.now();
+    const dt = Math.min((t - last) / 1000, 0.1);
+    last = t;
+    updateGame(dt);
+    renderer.render(scene, camera);
+  };
+  animate();
+}
+
+function onGameResize(){
+  if(!session.renderer || !session.camera) return;
+  const w = window.innerWidth, h = window.innerHeight;
+  session.renderer.setSize(w, h, false);
+  session.camera.aspect = w/h;
+  session.camera.updateProjectionMatrix();
+  const canvas = $('#gameCanvas');
+  canvas.width = w; canvas.height = h;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+}
+
+function leaveGame(){
+  if(session.animId){ cancelAnimationFrame(session.animId); session.animId = null; }
+  if(session.resizeHandler){ window.removeEventListener('resize', session.resizeHandler); session.resizeHandler = null; }
+  if(session.channel){ try{ session.channel.send({ type:'broadcast', event:'leave', payload:{ id: session.userId } }).catch(()=>{}); }catch(e){} }
+  if(session.renderer){ try{ session.renderer.dispose(); }catch(e){} session.renderer = null; }
+  if(session.scene){ session.scene.traverse(o => {
+    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
+    if(o.material) try{ o.material.dispose(); }catch(e){}
+  }); session.scene = null; }
+  if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} session.channel = null; }
+  session.camera = null; session.mode = null;
+  session.remotePlayers.clear();
+  session.remoteMeshes.clear();
+  session.players.clear();
+  $('#chatPanel').classList.remove('open');
+  showScreen('mainMenu'); startPreview();
+}
+
+/* ============ GAME LOOP ============ */
+function updateGame(dt){
+  const p = session.player;
+
+  // Input from joystick
+  const joyX = session.joyVec.x;
+  const joyY = -session.joyVec.y;
+
+  let vx = 0, vz = 0;
+  const moveSpeed = 4.5;
+  if(Math.abs(joyX) > 0.1 || Math.abs(joyY) > 0.1){
+    const fx = -Math.sin(session.yaw), fz = -Math.cos(session.yaw);
+    const rx = Math.cos(session.yaw), rz = -Math.sin(session.yaw);
+    vx = (fx * joyY + rx * joyX) * moveSpeed;
+    vz = (fz * joyY + rz * joyX) * moveSpeed;
+  }
+  // Keyboard
+  if(session.keys['w'] || session.keys['arrowup']){ vx += -Math.sin(session.yaw) * moveSpeed; vz += -Math.cos(session.yaw) * moveSpeed; }
+  if(session.keys['s'] || session.keys['arrowdown']){ vx += Math.sin(session.yaw) * moveSpeed; vz += Math.cos(session.yaw) * moveSpeed; }
+  if(session.keys['a'] || session.keys['arrowleft']){ vx += -Math.cos(session.yaw) * moveSpeed; vz += Math.sin(session.yaw) * moveSpeed; }
+  if(session.keys['d'] || session.keys['arrowright']){ vx += Math.cos(session.yaw) * moveSpeed; vz += -Math.sin(session.yaw) * moveSpeed; }
+
+  // X movement with collision
+  const nx = p.x + vx * dt;
+  if(!collides(nx, p.y, p.z)) p.x = nx;
+  // Z movement with collision
+  const nz = p.z + vz * dt;
+  if(!collides(p.x, p.y, nz)) p.z = nz;
+
+  // Gravity
+  const onG = isOnGround(p.x, p.y, p.z);
+  session.onGround = onG;
+  if(!onG) p.vy -= 22 * dt;
+  else if(p.vy < 0) p.vy = 0;
+
+  // Jump
+  if(session.jumpPressed && onG){ p.vy = 7.5; session.jumpPressed = false; }
+
+  // Y movement
+  const ny = p.y + p.vy * dt;
+  if(collides(p.x, ny, p.z)){
+    if(p.vy < 0){
+      // Hit ground
+      p.vy = 0;
+    } else {
+      // Hit ceiling
+      p.vy = 0;
+    }
+  } else {
+    p.y = ny;
+  }
+
+  // Respawn if fell off
+  if(p.y < -30){ p.x = 0; p.y = 0.5; p.z = 0; p.vy = 0; }
+
+  // Update camera
+  session.camera.position.set(p.x, p.y + 1.6, p.z);
+  session.camera.rotation.set(session.pitch, session.yaw, 0);
+
+  // Update remote players (interpolate)
+  for(const [id, rp] of session.remotePlayers){
+    const mesh = session.remoteMeshes.get(id);
+    if(!mesh) continue;
+    rp.currentX += (rp.targetX - rp.currentX) * Math.min(1, dt * 10);
+    rp.currentY += (rp.targetY - rp.currentY) * Math.min(1, dt * 10);
+    rp.currentZ += (rp.targetZ - rp.currentZ) * Math.min(1, dt * 10);
+    mesh.group.position.set(rp.currentX, rp.currentY, rp.currentZ);
+    mesh.group.rotation.y = rp.targetYaw;
+  }
+
+  // Update highlight box
+  const looked = raycastBlock();
+  if(looked && session.highlightBox){
+    session.highlightBox.position.set(looked.x, looked.y, looked.z);
+    session.highlightBox.visible = true;
+  } else if(session.highlightBox){
+    session.highlightBox.visible = false;
+  }
+
+  // Broadcast player state
+  if(session.channel && now() - session.lastBroadcast > 100){
+    session.lastBroadcast = now();
+    session.channel.send({ type:'broadcast', event:'player',
+      payload:{ id: session.userId, name: session.username,
+                x: p.x, y: p.y, z: p.z, yaw: session.yaw, pitch: session.pitch }
+    }).catch(()=>{});
+  }
+}
+
+/* ============ RAYCAST (VOXEL DDA) ============ */
+function raycastBlock(){
+  if(!session.camera) return null;
+  const origin = session.camera.position;
+  const dir = new THREE.Vector3();
+  session.camera.getWorldDirection(dir);
+  const maxDist = 6;
+
+  let x = Math.floor(origin.x), y = Math.floor(origin.y), z = Math.floor(origin.z);
+  const stepX = dir.x >= 0 ? 1 : -1;
+  const stepY = dir.y >= 0 ? 1 : -1;
+  const stepZ = dir.z >= 0 ? 1 : -1;
+  const tDeltaX = dir.x !== 0 ? Math.abs(1/dir.x) : Infinity;
+  const tDeltaY = dir.y !== 0 ? Math.abs(1/dir.y) : Infinity;
+  const tDeltaZ = dir.z !== 0 ? Math.abs(1/dir.z) : Infinity;
+  const xDist = stepX > 0 ? (x + 1 - origin.x) : (origin.x - x);
+  const yDist = stepY > 0 ? (y + 1 - origin.y) : (origin.y - y);
+  const zDist = stepZ > 0 ? (z + 1 - origin.z) : (origin.z - z);
+  let tMaxX = tDeltaX * xDist;
+  let tMaxY = tDeltaY * yDist;
+  let tMaxZ = tDeltaZ * zDist;
+  let face = [0, 0, 0];
+  let t = 0;
+  for(let i = 0; i < 100; i++){
+    if(t > maxDist) break;
+    if(world.has(wkey(x, y, z))){
+      return { x, y, z, face };
+    }
+    if(tMaxX < tMaxY && tMaxX < tMaxZ){
+      t = tMaxX; x += stepX; tMaxX += tDeltaX; face = [-stepX, 0, 0];
+    } else if(tMaxY < tMaxZ){
+      t = tMaxY; y += stepY; tMaxY += tDeltaY; face = [0, -stepY, 0];
+    } else {
+      t = tMaxZ; z += stepZ; tMaxZ += tDeltaZ; face = [0, 0, -stepZ];
+    }
+  }
+  return null;
+}
+
+/* ============ BREAK / PLACE ============ */
+function breakBlock(){
+  if(!session.scene) return;
+  const hit = raycastBlock();
+  if(!hit) return;
+  const blockType = getBlock(hit.x, hit.y, hit.z);
+  if(!blockType) return;
+  const def = BLOCK_TYPES[blockType];
+  if(def && def.unbreakable) return;
+  setBlock(hit.x, hit.y, hit.z, null, true);
+  // Reset vy if player standing on broken block? Let physics handle it
+}
+
+function placeBlock(){
+  if(!session.scene) return;
+  const type = hotbar[session.hotbarSelected];
+  if(!type) return;
+  const hit = raycastBlock();
+  if(!hit) return;
+  if(!hit.face || (hit.face[0] === 0 && hit.face[1] === 0 && hit.face[2] === 0)) return;
+  const nx = hit.x + hit.face[0];
+  const ny = hit.y + hit.face[1];
+  const nz = hit.z + hit.face[2];
+  // Don't place inside player
+  if(collides(nx + 0.5, ny - 0.5, nz + 0.5) && Math.abs(nx - session.player.x) < 1 && Math.abs(nz - session.player.z) < 1){
+    // Check if the block would be at player position
+    const p = session.player;
+    if(nx + 0.5 > p.x - 0.3 && nx - 0.5 < p.x + 0.3 &&
+       ny + 0.5 > p.y - 0.5 && ny - 0.5 < p.y + 1.8 &&
+       nz + 0.5 > p.z - 0.3 && nz - 0.5 < p.z + 0.3) return;
+  }
+  if(hasBlock(nx, ny, nz)) return;
+  setBlock(nx, ny, nz, type, true);
+}
+
+/* ============ INPUT ============ */
+function bindGameInput(canvas){
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const lookSens = () => 0.004 * (isMobile ? settings.camSpeedMobile : settings.camSpeedPC);
+
+  // === Keyboard (desktop) ===
+  window.addEventListener('keydown', e => {
+    if(document.activeElement.tagName === 'INPUT') return;
+    const k = e.key.toLowerCase();
+    if(k === 'w' || k === 'a' || k === 's' || k === 'd' || k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright'){
+      session.keys[k] = true;
+      if(k.startsWith('arrow')) e.preventDefault();
+    }
+    if(k === ' '){ session.jumpPressed = true; e.preventDefault(); }
+    if(k === 'e'){ openInventory(); }
+    if(k === 'escape'){ openPauseMenu(); }
+    if(k >= '1' && k <= '9'){ session.hotbarSelected = parseInt(k) - 1; renderHotbar(); }
+  });
+  window.addEventListener('keyup', e => {
+    session.keys[e.key.toLowerCase()] = false;
+  });
+
+  // === Mouse (desktop) ===
+  canvas.addEventListener('mousedown', e => {
+    if(e.button === 0){ breakBlock(); }
+    else if(e.button === 2){ placeBlock(); }
+    else if(e.button === 1){ e.preventDefault(); }
+    session.dragging = true;
+    session.lastX = e.clientX; session.lastY = e.clientY;
+  });
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('mousemove', e => {
+    if(!session.dragging) return;
+    const dx = e.clientX - session.lastX;
+    const dy = e.clientY - session.lastY;
+    session.lastX = e.clientX; session.lastY = e.clientY;
+    session.yaw -= dx * lookSens();
+    session.pitch -= dy * lookSens();
+    session.pitch = Math.max(-1.5, Math.min(1.5, session.pitch));
+  });
+  window.addEventListener('mouseup', () => { session.dragging = false; });
+
+  // === Touch look (drag on screen) ===
+  canvas.addEventListener('touchstart', e => {
+    for(const touch of e.changedTouches){
+      if(session.lookTouchId === null){
+        const tgt = document.elementFromPoint(touch.clientX, touch.clientY);
+        if(tgt && (tgt.closest('#joystick') || tgt.closest('button') || tgt.closest('#hotbar') || tgt.closest('#chatPanel'))){
+          continue;
+        }
+        session.lookTouchId = touch.identifier;
+        session.lastX = touch.clientX;
+        session.lastY = touch.clientY;
+      }
+    }
+  }, {passive: true});
+  canvas.addEventListener('touchmove', e => {
+    if(session.lookTouchId === null) return;
+    for(const touch of e.changedTouches){
+      if(touch.identifier === session.lookTouchId){
+        const dx = touch.clientX - session.lastX;
+        const dy = touch.clientY - session.lastY;
+        session.lastX = touch.clientX;
+        session.lastY = touch.clientY;
+        session.yaw -= dx * lookSens();
+        session.pitch -= dy * lookSens();
+        session.pitch = Math.max(-1.5, Math.min(1.5, session.pitch));
+        return;
+      }
+    }
+  }, {passive: true});
+  canvas.addEventListener('touchend', e => {
+    for(const touch of e.changedTouches){
+      if(touch.identifier === session.lookTouchId){
+        session.lookTouchId = null;
+        return;
+      }
+    }
+  });
+
+  // === Joystick ===
+  const joyEl = $('#joystick');
+  const knobEl = $('#joystickKnob');
+  const JR = 50;
+  joyEl.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if(session.joystickTouchId !== null) return;
+    const touch = e.changedTouches[0];
+    session.joystickTouchId = touch.identifier;
+    updateJoystick(touch.clientX, touch.clientY);
+  }, {passive: false});
+  window.addEventListener('touchmove', e => {
+    if(session.joystickTouchId === null) return;
+    for(const touch of e.changedTouches){
+      if(touch.identifier === session.joystickTouchId){
+        updateJoystick(touch.clientX, touch.clientY);
+        e.preventDefault();
+        return;
+      }
+    }
+  }, {passive: false});
+  window.addEventListener('touchend', e => {
+    for(const touch of e.changedTouches){
+      if(touch.identifier === session.joystickTouchId){
+        session.joystickTouchId = null;
+        session.joyVec.x = 0; session.joyVec.y = 0;
+        knobEl.style.transform = 'translate(-50%, -50%)';
+        return;
+      }
+    }
+  });
+  function updateJoystick(px, py){
+    const rect = joyEl.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const dx = px - cx, dy = py - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const clamped = Math.min(dist, JR);
+    const angle = Math.atan2(dy, dx);
+    const kx = Math.cos(angle) * clamped;
+    const ky = Math.sin(angle) * clamped;
+    knobEl.style.transform = `translate(calc(-50% + ${kx}px), calc(-50% + ${ky}px))`;
+    session.joyVec.x = kx / JR;
+    session.joyVec.y = ky / JR;
+  }
+
+  // === Buttons ===
+  bindActionButton('#btnBreak', () => breakBlock());
+  bindActionButton('#btnPlace', () => placeBlock());
+  bindActionButton('#btnJump', () => { session.jumpPressed = true; }, true);
+
+  function bindActionButton(sel, fn, isInstant){
+    const el = $(sel);
+    if(!el) return;
+    let holdTimer = null;
+    let active = false;
+    const start = e => {
+      e.preventDefault();
+      active = true;
+      fn();
+      if(!isInstant){
+        holdTimer = setInterval(fn, 180);
+      }
+    };
+    const end = e => {
+      active = false;
+      if(holdTimer){ clearInterval(holdTimer); holdTimer = null; }
+    };
+    el.addEventListener('touchstart', start, {passive: false});
+    el.addEventListener('touchend', end);
+    el.addEventListener('touchcancel', end);
+    el.addEventListener('mousedown', e => { e.preventDefault(); start(e); });
+    el.addEventListener('mouseup', end);
+    el.addEventListener('mouseleave', end);
+  }
+
+  // === HUD buttons ===
+  $('#btnMenu').onclick = () => openPauseMenu();
+  $('#btnChat').onclick = () => { if(session.mode === 'live') toggleChat(); else toast('الدردشة متاحة فقط في الانضمام المباشر', 'warn'); };
+  $('#btnPlayers').onclick = () => openPlayersModal();
+  $('#btnInventory').onclick = () => openInventory();
+}
+
+/* ============ HOTBAR ============ */
+function renderHotbar(){
+  const el = $('#hotbar');
+  if(!el) return;
+  el.innerHTML = hotbar.map((slot, i) => {
+    const def = slot ? BLOCK_TYPES[slot] : null;
+    const bg = def ? `background:${def.css}` : '';
+    return `<div class="hotbar-slot ${i === session.hotbarSelected ? 'selected' : ''}" data-slot="${i}">
+      ${slot ? `<div class="block-icon" style="${bg}"></div>` : ''}
+      <div class="slot-num">${i+1}</div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.hotbar-slot').forEach(s => {
+    s.onclick = () => { session.hotbarSelected = parseInt(s.dataset.slot); renderHotbar(); };
+  });
+}
+
+/* ============ INVENTORY ============ */
+function openInventory(){
+  const grid = $('#invGrid');
+  grid.innerHTML = INVENTORY_BLOCKS.map(type => {
+    const def = BLOCK_TYPES[type];
+    return `<div class="inv-item" data-type="${type}">
+      <div class="block-icon" style="background:${def.css}"></div>
+      <div class="inv-name">${def.name}</div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.inv-item').forEach(el => {
+    el.onclick = () => {
+      hotbar[session.hotbarSelected] = el.dataset.type;
+      renderHotbar();
+      $('#inventoryOverlay').classList.remove('active');
+    };
+  });
+  $('#inventoryOverlay').classList.add('active');
+}
+
+/* ============ CHAT ============ */
+function toggleChat(){
+  const el = $('#chatPanel');
+  el.classList.toggle('open');
+  if(el.classList.contains('open')) renderChat();
+}
 function renderChat(){
-  const el = $('#chatMessages'); if(!el) return;
+  const el = $('#chatMessages');
+  if(!el) return;
   const msgs = session.messages.filter(m => !m.deleted);
-  if(!msgs.length){ el.innerHTML = `<div class="chat-empty">${t('noMessages')}</div>`; return; }
+  if(!msgs.length){ el.innerHTML = '<div class="chat-empty">لا توجد رسائل بعد</div>'; return; }
   el.innerHTML = msgs.map(m => {
     const isMe = m.authorId === session.userId;
     return `<div class="chat-msg ${isMe ? 'me' : ''}">
@@ -770,47 +1418,94 @@ function renderChat(){
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
-
-/* ============ PLAYERS ============ */
-function renderPlayersList(){ updateHudInfo(); renderOperatorPlayers(); }
-function updateHudInfo(){
-  const el = $('#hudInfo'); if(!el) return;
-  el.innerHTML = `
-    <div class="hud-badge">👤 <strong>${escapeHtml(session.username || t('you'))}</strong></div>
-    <div class="hud-badge">🌐 ${session.mode === 'live' ? t('online') : t('singleMode')} · ${session.players.size + 1}</div>`;
+async function sendChat(text){
+  if(session.mode !== 'live'){ toast('الدردشة فقط في الانضمام المباشر', 'warn'); return; }
+  if(!text.trim()) return;
+  const msg = { id:'m_'+session.userId+'_'+now(), authorId:session.userId, author:session.username,
+    text:text.trim(), ts:now(), deleted:false };
+  session.messages.push(msg);
+  if(session.messages.length > 100) session.messages.shift();
+  renderChat(); renderOperatorMessages();
+  if(session.channel){
+    try{ await session.channel.send({ type:'broadcast', event:'chat', payload:{ type:'message', ...msg } }); }catch(e){}
+  }
 }
+
+/* ============ HUD INFO ============ */
+function updateHudInfo(){
+  const el = $('#hudInfo');
+  if(!el) return;
+  const count = session.players.size || (session.mode === 'live' ? 1 : 0);
+  el.innerHTML = `
+    <div class="hud-badge">👤 <strong>${escapeHtml(session.username || 'أنت')}</strong></div>
+    <div class="hud-badge">${session.mode === 'live' ? '🌐 ' + t('online') : '🎮 ' + t('singlePlayer')} · ${count} لاعب</div>`;
+}
+
+/* ============ PLAYERS MODAL ============ */
 function openPlayersModal(){
-  const rows = [{ id:session.userId, name:session.username, you:true }, ...[...session.players.values()].filter(p => p.id !== session.userId)];
+  const rows = [{ id: session.userId, name: session.username, you: true }];
+  session.players.forEach(p => { if(p.id !== session.userId) rows.push(p); });
   const html = rows.map(p => `
     <div class="player-row" style="margin:6px 0">
       <div class="player-avatar">${escapeHtml((p.name||'?').charAt(0).toUpperCase())}</div>
       <div class="player-info">
-        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· '+t('you') : ''}</div>
-        <div class="player-status">${t('online')}</div>
+        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· أنت' : ''}</div>
+        <div class="player-status">متصل</div>
       </div>
     </div>`).join('');
-  confirmDialog(t('players'), '', { yesLabel:'OK', noLabel:'✕', extra:{} });
+  confirmDialog('اللاعبون', '', { yesLabel:'OK', noLabel:'✕' });
   $('#confirmText').innerHTML = '<div style="max-height:50vh;overflow-y:auto">' + html + '</div>';
 }
 
-/* ============ MAIN MENU ============ */
-function bindMainMenu(){
-  $$('#mainMenu .menu-btn').forEach(btn => {
-    btn.onclick = () => {
-      const a = btn.dataset.action;
-      if(a === 'single') startGame('single');
-      else if(a === 'live'){
-        if(checkBan()) return;
-        if(!session.username){ showScreen('usernameScreen'); return; }
-        startGame('live');
-      }
-      else if(a === 'options') openOptions();
-      else if(a === 'operator') requestAdminAccess();
-    };
-  });
+/* ============ PAUSE MENU ============ */
+function openPauseMenu(){
+  $('#confirmTitle').textContent = 'إيقاف مؤقت';
+  $('#confirmText').textContent = 'اختر إجراء';
+  $('#confirmExtra').innerHTML = '';
+  $('#confirmYes').textContent = 'متابعة';
+  $('#confirmNo').textContent = 'القائمة الرئيسية';
+  $('#confirmOverlay').classList.add('active');
+  $('#confirmYes').onclick = () => { $('#confirmOverlay').classList.remove('active'); };
+  $('#confirmNo').onclick = () => { $('#confirmOverlay').classList.remove('active'); leaveGame(); };
 }
 
-/* ============ ADMIN PIN ============ */
+/* ============ ADMIN / BAN ============ */
+function saveBan(b){ try{ localStorage.setItem('arena_ban', JSON.stringify(b)); }catch(e){} }
+function loadBan(){ try{ const r=localStorage.getItem('arena_ban'); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function checkBan(){
+  const info = loadBan();
+  if(info && info.until > now()){
+    session.banInfo = info;
+    showScreen('banScreen'); renderBanScreen();
+    return true;
+  }
+  if(info) try{ localStorage.removeItem('arena_ban'); }catch(e){}
+  return false;
+}
+function applyBan(info){
+  saveBan(info);
+  if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} session.channel = null; }
+  if(session.mode) leaveGame();
+  session.banInfo = info;
+  showScreen('banScreen'); renderBanScreen();
+}
+function renderBanScreen(){
+  const info = session.banInfo; if(!info) return;
+  const rem = Math.max(0, info.until - now());
+  const mins = Math.floor(rem/60000);
+  const secs = Math.floor((rem%60000)/1000);
+  $('#banInfo').innerHTML = `
+    <div class="row"><span>محظور حتى</span><span class="countdown">${mins}:${secs.toString().padStart(2,'0')}</span></div>
+    <div class="row"><span>السبب</span><span>${escapeHtml(info.reason || '-')}</span></div>
+    <div class="row"><span>بواسطة</span><span>${escapeHtml(info.by || '-')}</span></div>`;
+  if(rem <= 0){
+    session.banInfo = null;
+    try{ localStorage.removeItem('arena_ban'); }catch(e){}
+    showScreen('mainMenu'); startPreview();
+  } else setTimeout(renderBanScreen, 1000);
+}
+
+/* ============ ADMIN LOCK ============ */
 function requestAdminAccess(){
   session.pinInput = '';
   updatePinDisplay();
@@ -838,7 +1533,7 @@ function checkPin(){
     openOperator();
   } else {
     $('#pinDisplay').classList.add('shake');
-    $('#lockError').textContent = t('wrongPin');
+    $('#lockError').textContent = 'رمز خاطئ';
     setTimeout(() => {
       $('#pinDisplay').classList.remove('shake');
       session.pinInput = '';
@@ -847,509 +1542,12 @@ function checkPin(){
     }, 500);
   }
 }
-function bindAdminLock(){
-  $$('#adminLock .pin-pad button').forEach(b => {
-    b.onclick = () => pinKeyPress(b.dataset.pin);
-  });
-  $('#lockExit').onclick = () => { session.pinInput = ''; updatePinDisplay(); showScreen('mainMenu'); startPreview(); };
-}
-
-/* ============ OPTIONS ============ */
-function openOptions(){
-  stopPreview();
-  showScreen('options');
-  $('#optLang').value = settings.lang;
-  $('#optPov').value = settings.pov; $('#optPovVal').textContent = settings.pov;
-  $('#optGyro').classList.toggle('on', settings.gyro);
-  $('#optCamPC').value = settings.camSpeedPC; $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1)+'x';
-  $('#optCamMobile').value = settings.camSpeedMobile; $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1)+'x';
-}
-function bindOptions(){
-  $('#optBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
-  $('#optLang').onchange = e => {
-    settings.lang = e.target.value; T = LANGS[settings.lang]; saveSettings(); applyI18n();
-    renderChat(); updateHudInfo();
-    toast(settings.lang === 'ar' ? 'تم تغيير اللغة' : 'Language changed', 'success');
-  };
-  $('#optPov').oninput = e => {
-    settings.pov = +e.target.value; $('#optPovVal').textContent = settings.pov; saveSettings();
-    if(session.camera){ session.camera.fov = settings.pov; session.camera.updateProjectionMatrix(); }
-  };
-  $('#optGyro').onclick = () => {
-    settings.gyro = !settings.gyro; $('#optGyro').classList.toggle('on', settings.gyro); saveSettings();
-    if(settings.gyro) enableGyro(); else disableGyro();
-  };
-  $('#optCamPC').oninput = e => { settings.camSpeedPC = +e.target.value; $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1)+'x'; saveSettings(); };
-  $('#optCamMobile').oninput = e => { settings.camSpeedMobile = +e.target.value; $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1)+'x'; saveSettings(); };
-  $('#optEditTouch').onclick = () => openTouchEditor();
-  $('#optReset').onclick = async () => {
-    const ok = await confirmDialog(t('reset'), t('resetConfirm'), { yesLabel: t('resetConfirmBtn'), noLabel: t('cancel') });
-    if(ok){
-      const lang = settings.lang, username = settings.username;
-      settings = { ...DEFAULT_SETTINGS, lang, username, touchButtons:null };
-      saveSettings(); applyI18n(); openOptions();
-      toast(settings.lang === 'ar' ? 'تمت إعادة التعيين' : 'Reset done', 'success');
-    }
-  };
-}
-
-/* ============ GYRO ============ */
-function enableGyro(){
-  if(typeof DeviceOrientationEvent === 'undefined') return;
-  if(typeof DeviceOrientationEvent.requestPermission === 'function'){
-    DeviceOrientationEvent.requestPermission().then(r => { if(r === 'granted') attachGyro(); }).catch(()=>{});
-  } else attachGyro();
-}
-function attachGyro(){
-  if(session.deviceOrientationHandler) return;
-  session.deviceOrientationHandler = e => {
-    if(!settings.gyro || !session.camera) return;
-    if(e.alpha !== null){
-      session.yaw = -(e.alpha * Math.PI) / 180;
-      session.pitch = Math.max(-1.4, Math.min(1.4, -(((e.beta || 0) - 90) * Math.PI / 180)));
-    }
-  };
-  window.addEventListener('deviceorientation', session.deviceOrientationHandler);
-}
-function disableGyro(){
-  if(session.deviceOrientationHandler){
-    window.removeEventListener('deviceorientation', session.deviceOrientationHandler);
-    session.deviceOrientationHandler = null;
-  }
-}
-
-/* ============ TOUCH EDITOR ============ */
-function openTouchEditor(){
-  showScreen('');
-  $('#editorOverlay').classList.add('active');
-  $('#editorTopbar').classList.add('active');
-  document.body.classList.add('editor-mode');
-  const overlay = $('#editorOverlay'); overlay.innerHTML = '';
-  const btns = getTouchButtons();
-  Object.entries(btns).forEach(([name, b]) => {
-    const el = document.createElement('div');
-    el.className = 'touch-btn'; el.dataset.tb = name;
-    el.textContent = name === 'chat' ? '💬' : name === 'menu' ? '☰' : '👥';
-    el.style.left = b.x + 'px'; el.style.top = b.y + 'px';
-    el.style.width = b.w + 'px'; el.style.height = b.h + 'px'; el.style.opacity = b.opacity;
-    el.style.position = 'absolute';
-    const rh = document.createElement('div'); rh.className = 'resize-handle';
-    el.appendChild(rh);
-    overlay.appendChild(el);
-    attachEditorDrag(el, name, rh);
-  });
-  $('#editorBottom').classList.remove('active');
-  session.editorSelection = null;
-  $('#edInfo').textContent = t('selectButton');
-}
-function attachEditorDrag(el, name, handle){
-  let mode = null, startX = 0, startY = 0, startRect = null;
-  const btns = getTouchButtons();
-  const onDown = (e, isResize) => {
-    e.preventDefault(); e.stopPropagation();
-    if(!el.classList.contains('selected')){
-      $('#editorOverlay').querySelectorAll('.touch-btn').forEach(b => b.classList.remove('selected'));
-      el.classList.add('selected');
-      session.editorSelection = name;
-      $('#editorBottom').classList.add('active');
-      $('#edOpacity').value = Math.round(btns[name].opacity * 100);
-      $('#edOpacityVal').textContent = Math.round(btns[name].opacity * 100) + '%';
-      $('#edSize').value = btns[name].w;
-      $('#edSizeVal').textContent = btns[name].w + 'px';
-    }
-    mode = isResize ? 'resize' : 'move';
-    const pt = e.touches ? e.touches[0] : e;
-    startX = pt.clientX; startY = pt.clientY;
-    startRect = { x: btns[name].x, y: btns[name].y, w: btns[name].w, h: btns[name].h };
-  };
-  el.addEventListener('mousedown', e => { if(e.target === handle) return; onDown(e, false); });
-  el.addEventListener('touchstart', e => { if(e.target === handle) return; onDown(e, false); }, {passive:false});
-  handle.addEventListener('mousedown', e => onDown(e, true));
-  handle.addEventListener('touchstart', e => onDown(e, true), {passive:false});
-  const onMove = e => {
-    if(!mode) return;
-    const pt = e.touches ? e.touches[0] : e;
-    const dx = pt.clientX - startX, dy = pt.clientY - startY;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    if(mode === 'move'){
-      let nx = Math.max(0, Math.min(startRect.x + dx, vw - startRect.w));
-      let ny = Math.max(0, Math.min(startRect.y + dy, vh - startRect.h));
-      if(!wouldOverlap(name, nx, ny, startRect.w, startRect.h)){
-        btns[name].x = nx; btns[name].y = ny;
-        el.style.left = nx + 'px'; el.style.top = ny + 'px';
-      }
-    } else {
-      let nw = Math.max(40, Math.min(startRect.w + dx, 120));
-      let nh = Math.max(40, Math.min(startRect.h + dy, 120));
-      nw = Math.min(nw, vw - startRect.x); nh = Math.min(nh, vh - startRect.y);
-      if(!wouldOverlap(name, startRect.x, startRect.y, nw, nh)){
-        btns[name].w = nw; btns[name].h = nh;
-        el.style.width = nw + 'px'; el.style.height = nh + 'px';
-        $('#edSize').value = nw; $('#edSizeVal').textContent = nw + 'px';
-      }
-    }
-  };
-  const onUp = () => { mode = null; saveSettings(); };
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('touchmove', onMove, {passive:false});
-  window.addEventListener('mouseup', onUp);
-  window.addEventListener('touchend', onUp);
-}
-function wouldOverlap(exclude, x, y, w, h){
-  const btns = getTouchButtons(), pad = 4;
-  for(const [name, b] of Object.entries(btns)){
-    if(name === exclude) continue;
-    if(x < b.x + b.w + pad && x + w + pad > b.x && y < b.y + b.h + pad && y + h + pad > b.y) return true;
-  }
-  return false;
-}
-function bindEditor(){
-  $('#edBack').onclick = () => closeEditor(true);
-  $('#edReset').onclick = async () => {
-    const ok = await confirmDialog(t('reset'), t('resetConfirm'), { yesLabel: t('resetConfirmBtn'), noLabel: t('cancel') });
-    if(ok){
-      settings.touchButtons = null; initTouchButtons(); saveSettings(); openTouchEditor();
-      toast(settings.lang === 'ar' ? 'تمت إعادة التعيين' : 'Reset done', 'success');
-    }
-  };
-  $('#edOpacity').oninput = e => {
-    if(!session.editorSelection) return;
-    const v = +e.target.value;
-    $('#edOpacityVal').textContent = v + '%';
-    getTouchButtons()[session.editorSelection].opacity = v / 100;
-    const el = $('#editorOverlay').querySelector(`[data-tb="${session.editorSelection}"]`);
-    if(el) el.style.opacity = v / 100;
-    saveSettings();
-  };
-  $('#edSize').oninput = e => {
-    if(!session.editorSelection) return;
-    const v = +e.target.value;
-    const b = getTouchButtons()[session.editorSelection];
-    if(wouldOverlap(session.editorSelection, b.x, b.y, v, v)){
-      $('#edSize').value = b.w; $('#edSizeVal').textContent = b.w + 'px'; return;
-    }
-    $('#edSizeVal').textContent = v + 'px';
-    b.w = v; b.h = v;
-    const el = $('#editorOverlay').querySelector(`[data-tb="${session.editorSelection}"]`);
-    if(el){ el.style.width = v + 'px'; el.style.height = v + 'px'; }
-    saveSettings();
-  };
-}
-function closeEditor(back){
-  $('#editorOverlay').classList.remove('active');
-  $('#editorTopbar').classList.remove('active');
-  $('#editorBottom').classList.remove('active');
-  document.body.classList.remove('editor-mode');
-  renderTouchButtons($('#touchMenu'));
-  if(back){ showScreen('options'); } 
-}
-
-/* ============ MINECRAFT WORLD BUILDER ============ */
-function createSky(scene){
-  const skyGeo = new THREE.SphereGeometry(500, 32, 16);
-  const skyMat = new THREE.ShaderMaterial({
-    uniforms: {
-      topColor: { value: new THREE.Color(0x3a7bd5) },
-      bottomColor: { value: new THREE.Color(0xd4f0ff) },
-      offset: { value: 30 },
-      exponent: { value: 0.8 }
-    },
-    vertexShader: `varying vec3 vWorldPosition;
-      void main(){
-        vec4 wp = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = wp.xyz;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }`,
-    fragmentShader: `uniform vec3 topColor; uniform vec3 bottomColor;
-      uniform float offset; uniform float exponent; varying vec3 vWorldPosition;
-      void main(){
-        float h = normalize(vWorldPosition + offset).y;
-        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
-      }`,
-    side: THREE.BackSide, depthWrite: false
-  });
-  scene.add(new THREE.Mesh(skyGeo, skyMat));
-}
-function addLights(scene){
-  const sun = new THREE.DirectionalLight(0xfff4d6, 1.4);
-  sun.position.set(80, 120, 40); scene.add(sun);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-  scene.add(new THREE.HemisphereLight(0x87ceeb, 0x4caf50, 0.5));
-  const sunSphere = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff8d0 }));
-  sunSphere.position.set(150, 180, 90); scene.add(sunSphere);
-}
-function addClouds(scene){
-  const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
-  for(let i = 0; i < 20; i++){
-    const w = 12 + Math.random() * 25;
-    const h = 2 + Math.random() * 3;
-    const d = 10 + Math.random() * 18;
-    const c = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-    c.position.set((Math.random()-0.5)*350, 70 + Math.random()*40, (Math.random()-0.5)*350);
-    scene.add(c);
-  }
-}
-function createTree(scene, x, y, z){
-  const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8b5a2b });
-  const leafMat = new THREE.MeshLambertMaterial({ color: 0x2d8a2d });
-  const trunkGeo = new THREE.BoxGeometry(1, 1, 1);
-  for(let i = 0; i < 4; i++){
-    const m = new THREE.Mesh(trunkGeo, trunkMat);
-    m.position.set(x, y + 0.5 + i, z); scene.add(m);
-  }
-  const leafGeo = new THREE.BoxGeometry(1.1, 1.1, 1.1);
-  for(let lx = -1; lx <= 1; lx++) for(let lz = -1; lz <= 1; lz++){
-    if(lx === 0 && lz === 0) continue;
-    const m = new THREE.Mesh(leafGeo, leafMat);
-    m.position.set(x + lx, y + 4, z + lz); scene.add(m);
-  }
-  for(let lx = -1; lx <= 1; lx++) for(let lz = -1; lz <= 1; lz++){
-    const m = new THREE.Mesh(leafGeo, leafMat);
-    m.position.set(x + lx, y + 5, z + lz); scene.add(m);
-  }
-  const top = new THREE.Mesh(leafGeo, leafMat);
-  top.position.set(x, y + 6, z); scene.add(top);
-}
-function createTower(scene, x, y, z){
-  const colors = [0x808080, 0x8b5a2b, 0xa0522d, 0x9e7b5a];
-  const color = colors[Math.floor(Math.random()*colors.length)];
-  const mat = new THREE.MeshLambertMaterial({ color });
-  const h = 3 + Math.floor(Math.random() * 4);
-  for(let i = 0; i < h; i++){
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
-    m.position.set(x, y + 0.5 + i, z); scene.add(m);
-  }
-}
-function createMinecraftWorld(opts = {}){
-  const { gridRadius = 22, treeCount = 14, towerCount = 8 } = opts;
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xd4f0ff);
-  scene.fog = new THREE.Fog(0xd4f0ff, 90, 220);
-  createSky(scene);
-  addLights(scene);
-  addClouds(scene);
-  // Flat real ground plane
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000),
-    new THREE.MeshLambertMaterial({ color: 0x5cb85c })
-  );
-  ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
-  // Block grid (grass blocks)
-  const blockSize = 2;
-  const blockGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
-  const grassMat = new THREE.MeshLambertMaterial({ color: 0x6cc24a });
-  const count = (gridRadius * 2 + 1) ** 2;
-  const inst = new THREE.InstancedMesh(blockGeo, grassMat, count);
-  const dummy = new THREE.Object3D();
-  let i = 0;
-  for(let x = -gridRadius; x <= gridRadius; x++){
-    for(let z = -gridRadius; z <= gridRadius; z++){
-      dummy.position.set(x * blockSize, -blockSize / 2, z * blockSize);
-      dummy.updateMatrix();
-      inst.setMatrixAt(i++, dummy.matrix);
-    }
-  }
-  inst.instanceMatrix.needsUpdate = true; scene.add(inst);
-  // Trees
-  for(let k = 0; k < treeCount; k++){
-    const a = Math.random() * Math.PI * 2;
-    const r = 10 + Math.random() * (gridRadius * blockSize * 0.65);
-    createTree(scene, Math.cos(a)*r, 0, Math.sin(a)*r);
-  }
-  // Towers
-  for(let k = 0; k < towerCount; k++){
-    const x = (Math.random()-0.5) * gridRadius * blockSize * 1.3;
-    const z = (Math.random()-0.5) * gridRadius * blockSize * 1.3;
-    createTower(scene, x, 0, z);
-  }
-  return scene;
-}
-
-/* ============ PREVIEW (MENU BACKGROUND) ============ */
-function startPreview(){
-  if(session.previewActive) return;
-  session.previewActive = true;
-  const canvas = $('#previewCanvas');
-  if(!canvas) return;
-  const w = window.innerWidth, h = window.innerHeight;
-  canvas.width = w * Math.min(window.devicePixelRatio, 2);
-  canvas.height = h * Math.min(window.devicePixelRatio, 2);
-  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(w, h, false);
-  session.previewRenderer = renderer;
-
-  const scene = createMinecraftWorld({ gridRadius: 12, treeCount: 8, towerCount: 5 });
-  session.previewScene = scene;
-
-  const camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
-  session.previewCamera = camera;
-
-  let time = 0;
-  const animate = () => {
-    if(!session.previewActive) return;
-    session.previewAnimId = requestAnimationFrame(animate);
-    time += 0.005;
-    const radius = 34;
-    const angle = time * 0.15;
-    camera.position.x = Math.cos(angle) * radius;
-    camera.position.z = Math.sin(angle) * radius;
-    camera.position.y = 18 + Math.sin(time * 0.6) * 3;
-    camera.lookAt(0, 4, 0);
-    renderer.render(scene, camera);
-  };
-  animate();
-
-  const onResize = () => {
-    if(!session.previewActive) return;
-    const w2 = window.innerWidth, h2 = window.innerHeight;
-    renderer.setSize(w2, h2, false);
-    camera.aspect = w2/h2; camera.updateProjectionMatrix();
-    canvas.style.width = w2 + 'px'; canvas.style.height = h2 + 'px';
-  };
-  window.addEventListener('resize', onResize);
-  session.previewResizeHandler = onResize;
-}
-function stopPreview(){
-  session.previewActive = false;
-  if(session.previewAnimId){ cancelAnimationFrame(session.previewAnimId); session.previewAnimId = null; }
-  if(session.previewResizeHandler){ window.removeEventListener('resize', session.previewResizeHandler); session.previewResizeHandler = null; }
-  if(session.previewRenderer){ try{ session.previewRenderer.dispose(); }catch(e){} session.previewRenderer = null; }
-  if(session.previewScene){ session.previewScene.traverse(o => {
-    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
-    if(o.material) try{ o.material.dispose(); }catch(e){}
-  }); session.previewScene = null; }
-  session.previewCamera = null;
-}
-
-/* ============ GAME ============ */
-function startGame(mode){
-  if(mode === 'live' && checkBan()) return;
-  stopPreview();
-  session.mode = mode;
-  showScreen('game');
-  initGameScene();
-  renderTouchButtons($('#touchMenu'));
-  bindTouchButtonActions();
-  updateHudInfo();
-  if(mode === 'live') joinLiveChannel();
-  else { session.players.clear(); session.messages = []; }
-}
-function leaveGame(){
-  if(session.animId){ cancelAnimationFrame(session.animId); session.animId = null; }
-  if(session.renderer){ try{ session.renderer.dispose(); }catch(e){} session.renderer = null; }
-  if(session.scene){ session.scene.traverse(o => {
-    if(o.geometry) try{ o.geometry.dispose(); }catch(e){}
-    if(o.material) try{ o.material.dispose(); }catch(e){}
-  }); session.scene = null; }
-  session.camera = null; session.mode = null;
-  session.botTimers.forEach(t => clearInterval(t)); session.botTimers = [];
-  if(session.channel){ try{ session.channel.unsubscribe(); }catch(e){} session.channel = null; }
-  $('#chatPanel').classList.remove('open');
-  showScreen('mainMenu'); startPreview();
-}
-function initGameScene(){
-  const canvas = $('#gameCanvas');
-  const w = window.innerWidth, h = window.innerHeight;
-  canvas.width = w; canvas.height = h;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(w, h, false);
-  session.renderer = renderer;
-
-  const scene = createMinecraftWorld({ gridRadius: 25, treeCount: 20, towerCount: 12 });
-  session.scene = scene;
-
-  const camera = new THREE.PerspectiveCamera(settings.pov, w/h, 0.1, 1000);
-  camera.position.set(0, 1.7, 0);
-  camera.rotation.order = 'YXZ';
-  session.camera = camera;
-  session.yaw = 0; session.pitch = 0;
-
-  bindGameInput(canvas);
-  window.addEventListener('resize', onGameResize);
-
-  let last = performance.now();
-  const animate = () => {
-    session.animId = requestAnimationFrame(animate);
-    const t = performance.now(); const dt = (t - last) / 1000; last = t;
-    camera.rotation.y = session.yaw;
-    camera.rotation.x = session.pitch;
-    const speed = 6 * dt;
-    const fwd = new THREE.Vector3(-Math.sin(session.yaw), 0, -Math.cos(session.yaw));
-    const right = new THREE.Vector3(Math.cos(session.yaw), 0, -Math.sin(session.yaw));
-    if(session.keys['w'] || session.keys['arrowup']) camera.position.addScaledVector(fwd, speed);
-    if(session.keys['s'] || session.keys['arrowdown']) camera.position.addScaledVector(fwd, -speed);
-    if(session.keys['a'] || session.keys['arrowleft']) camera.position.addScaledVector(right, -speed);
-    if(session.keys['d'] || session.keys['arrowright']) camera.position.addScaledVector(right, speed);
-    camera.position.y = 1.7;
-    renderer.render(scene, camera);
-  };
-  animate();
-}
-function bindGameInput(canvas){
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const sens = () => 0.0025 * (isMobile ? settings.camSpeedMobile : settings.camSpeedPC);
-  const onDown = e => {
-    if(e.target.closest('.touch-btn') || e.target.closest('#chatPanel')) return;
-    session.dragging = true;
-    const pt = e.touches ? e.touches[0] : e;
-    session.lastX = pt.clientX; session.lastY = pt.clientY;
-  };
-  const onMove = e => {
-    if(!session.dragging) return;
-    const pt = e.touches ? e.touches[0] : e;
-    const dx = pt.clientX - session.lastX, dy = pt.clientY - session.lastY;
-    session.lastX = pt.clientX; session.lastY = pt.clientY;
-    session.yaw -= dx * sens(); session.pitch -= dy * sens();
-    session.pitch = Math.max(-1.45, Math.min(1.45, session.pitch));
-  };
-  const onUp = () => { session.dragging = false; };
-  canvas.addEventListener('mousedown', onDown);
-  canvas.addEventListener('touchstart', onDown, {passive:true});
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('touchmove', onMove, {passive:true});
-  window.addEventListener('mouseup', onUp);
-  window.addEventListener('touchend', onUp);
-  window.addEventListener('keydown', e => {
-    if(document.activeElement.tagName === 'INPUT') return;
-    session.keys[e.key.toLowerCase()] = true;
-  });
-  window.addEventListener('keyup', e => { session.keys[e.key.toLowerCase()] = false; });
-}
-function onGameResize(){
-  if(!session.renderer || !session.camera) return;
-  const w = window.innerWidth, h = window.innerHeight;
-  session.renderer.setSize(w, h, false);
-  session.camera.aspect = w/h; session.camera.updateProjectionMatrix();
-  const canvas = $('#gameCanvas'); canvas.width = w; canvas.height = h;
-  const btns = getTouchButtons();
-  Object.values(btns).forEach(b => {
-    b.x = Math.max(0, Math.min(b.x, w - b.w));
-    b.y = Math.max(0, Math.min(b.y, h - b.h));
-  });
-  saveSettings(); renderTouchButtons($('#touchMenu'));
-}
-function openPauseMenu(){
-  const ov = $('#confirmOverlay');
-  $('#confirmTitle').textContent = t('pause');
-  $('#confirmText').textContent = t('resume') + ' / ' + t('options');
-  $('#confirmExtra').innerHTML = '';
-  $('#confirmYes').textContent = t('resume');
-  $('#confirmNo').textContent = t('backToMenu');
-  ov.classList.add('active');
-  $('#confirmYes').onclick = () => { ov.classList.remove('active'); };
-  $('#confirmNo').onclick = () => { ov.classList.remove('active'); leaveGame(); };
-}
 
 /* ============ OPERATOR ============ */
 function openOperator(){
   showScreen('operator');
   const badge = $('#opAdminBadge');
-  if(session.username === ADMIN_USERNAME){ badge.textContent = 'ADMIN ' + session.username; badge.style.display = ''; }
-  else { badge.textContent = 'GUEST'; badge.style.display = ''; }
+  badge.textContent = session.username === ADMIN_USERNAME ? 'ADMIN · ' + session.username : 'GUEST';
   renderOperatorPlayers();
   renderOperatorMessages();
   $$('.op-tab').forEach(tab => {
@@ -1363,105 +1561,242 @@ function openOperator(){
   });
 }
 function renderOperatorPlayers(){
-  const el = $('#opPlayers'); if(!el) return;
-  const rows = [{ id:session.userId, name:session.username || t('you'), you:true }, ...[...session.players.values()].filter(p => p.id !== session.userId)];
-  if(!rows.length){ el.innerHTML = ''; return; }
+  const el = $('#opPlayers');
+  if(!el) return;
+  const rows = [{ id: session.userId, name: session.username || 'أنت', you: true }];
+  session.players.forEach(p => { if(p.id !== session.userId) rows.push(p); });
   el.innerHTML = rows.map(p => `
     <div class="player-row">
       <div class="player-avatar">${escapeHtml((p.name||'?').charAt(0).toUpperCase())}</div>
       <div class="player-info">
-        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· '+t('you') : ''}</div>
-        <div class="player-status">${t('online')}</div>
+        <div class="player-name">${escapeHtml(p.name)} ${p.you ? '· أنت' : ''}</div>
+        <div class="player-status">متصل</div>
       </div>
       <div class="player-actions">
-        <button class="btn small warn" data-op="warn" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">${t('warn')}</button>
-        <button class="btn small danger" data-op="ban" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">${t('ban')}</button>
+        <button class="btn small warn" data-op="warn" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">تحذير</button>
+        <button class="btn small danger" data-op="ban" data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">حظر</button>
       </div>
     </div>`).join('');
   el.querySelectorAll('[data-op]').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.dataset.id, name = btn.dataset.name;
-      const player = { id, name };
       if(btn.dataset.op === 'warn'){
-        const reason = await confirmDialog(t('confirmWarn'), '', {
-          yesLabel: t('warn'), noLabel: t('cancel'),
-          extra: { input: { type:'text', placeholder: t('reason') } }
+        const reason = await confirmDialog('تحذير ' + name, 'اكتب السبب', {
+          yesLabel: 'تحذير', noLabel: 'إلغاء',
+          extra: { input: { type:'text', placeholder: 'السبب' } }
         });
-        if(reason !== false) warnPlayer(player, reason || '');
+        if(reason !== false){
+          if(session.channel && id !== session.userId){
+            session.channel.send({ type:'broadcast', event:'chat',
+              payload:{ type:'warn', targetId: id, reason: reason || 'تحذير من المشرف', by: session.username } }).catch(()=>{});
+          }
+          toast('تم تحذير ' + name, 'warn');
+        }
       } else {
-        const result = await confirmDialog(t('confirmBan'), '', {
-          yesLabel: t('ban'), noLabel: t('cancel'),
-          extra: { input: { type:'number', placeholder: t('banDuration'), value:'5', min:1, max:1440 } }
+        const mins = await confirmDialog('حظر ' + name, 'أدخل المدة بالدقائق', {
+          yesLabel: 'حظر', noLabel: 'إلغاء',
+          extra: { input: { type:'number', placeholder: 'دقائق', value:'5', min:1, max:1440 } }
         });
-        if(result !== false){
-          const minutes = Math.max(1, parseInt(result) || 5);
-          banPlayer(player, minutes, 'Banned by operator');
+        if(mins !== false){
+          const minutes = Math.max(1, parseInt(mins) || 5);
+          const until = now() + minutes * 60000;
+          if(id === session.userId){
+            applyBan({ until, reason: 'حظر من المشرف', by: session.username });
+          } else if(session.channel){
+            session.channel.send({ type:'broadcast', event:'chat',
+              payload:{ type:'ban', targetId: id, until, reason: 'حظر من المشرف', by: session.username } }).catch(()=>{});
+          }
+          toast('تم حظر ' + name, 'success');
         }
       }
     };
   });
 }
 function renderOperatorMessages(){
-  const el = $('#opMessages'); if(!el) return;
-  if(!session.messages.length){ el.innerHTML = `<div style="color:var(--text-dim);text-align:center;padding:20px">${t('noMessages')}</div>`; return; }
+  const el = $('#opMessages');
+  if(!el) return;
+  if(!session.messages.length){ el.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:20px">لا توجد رسائل</div>'; return; }
   el.innerHTML = session.messages.slice(-50).map(m => `
     <div class="msg-row">
       <div class="msg-content">
         <div class="msg-author">${escapeHtml(m.author)}</div>
-        <div class="msg-text">${m.deleted ? '<em style="color:var(--danger)">[deleted]</em>' : escapeHtml(m.text)}</div>
+        <div class="msg-text">${m.deleted ? '<em style="color:#ef4444">[محذوفة]</em>' : escapeHtml(m.text)}</div>
         <div class="msg-time">${formatTime(m.ts)}</div>
       </div>
-      <button class="btn small danger" data-del="${escapeHtml(m.id)}" ${m.deleted ? 'disabled' : ''}>${t('delete')}</button>
+      <button class="btn small danger" data-del="${escapeHtml(m.id)}" ${m.deleted ? 'disabled' : ''}>حذف</button>
     </div>`).join('');
   el.querySelectorAll('[data-del]').forEach(btn => {
     btn.onclick = async () => {
-      const ok = await confirmDialog(t('confirmDelete'), '', { yesLabel: t('delete'), noLabel: t('cancel') });
-      if(ok){ const msg = session.messages.find(x => x.id === btn.dataset.del); if(msg) deleteMsg(msg); }
+      const ok = await confirmDialog('حذف الرسالة؟', '', { yesLabel:'حذف', noLabel:'إلغاء' });
+      if(ok){
+        const msg = session.messages.find(x => x.id === btn.dataset.del);
+        if(msg){
+          msg.deleted = true;
+          renderChat(); renderOperatorMessages();
+          if(session.channel){
+            session.channel.send({ type:'broadcast', event:'chat',
+              payload:{ type:'delete', id: msg.id } }).catch(()=>{});
+          }
+        }
+      }
     };
   });
 }
 
-/* ============ BOOT ============ */
-async function boot(){
-  applyI18n();
-  initTouchButtons();
-  await initSupabase();
-
-  if(settings.username && settings.username.trim()) session.username = settings.username;
-  else showScreen('usernameScreen');
-
-  bindMainMenu();
-  bindOptions();
-  bindEditor();
-  bindAdminLock();
-
-  $('#opBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
-  $('#uContinue').onclick = () => {
-    const v = $('#uInput').value.trim();
-    if(!v){ toast(t('enterName2'), 'error'); return; }
-    session.username = v; settings.username = v; saveSettings();
-    showScreen('mainMenu'); startPreview();
-  };
-  $('#uInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#uContinue').click(); });
-  $('#chatClose').onclick = () => $('#chatPanel').classList.remove('open');
-  $('#chatSend').onclick = () => { const v = $('#chatInput').value; if(v.trim()){ sendChat(v); $('#chatInput').value = ''; } };
-  $('#chatInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#chatSend').click(); });
-  $('#banExit').onclick = () => { showScreen('mainMenu'); startPreview(); };
-
-  if(!checkBan()){
-    showScreen('mainMenu');
-    setTimeout(startPreview, 50);
-  }
-
-  window.addEventListener('resize', () => {
-    if(session.mode) onGameResize();
-    if(session.previewActive) renderTouchButtons($('#touchMenu'));
-  });
-
-  document.addEventListener('visibilitychange', () => { if(document.hidden) session.keys = {}; });
+/* ============ OPTIONS ============ */
+function openOptions(){
+  stopPreview();
+  showScreen('options');
+  $('#optLang').value = settings.lang;
+  $('#optPov').value = settings.pov;
+  $('#optPovVal').textContent = settings.pov;
+  $('#optGyro').classList.toggle('on', settings.gyro);
+  $('#optCamPC').value = settings.camSpeedPC;
+  $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1) + 'x';
+  $('#optCamMobile').value = settings.camSpeedMobile;
+  $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1) + 'x';
 }
 
-boot().catch(err => { console.error(err); showScreen('mainMenu'); });
+/* ============ GYRO ============ */
+let gyroHandler = null;
+function enableGyro(){
+  if(typeof DeviceOrientationEvent === 'undefined') return;
+  if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission().then(r => { if(r === 'granted') attachGyro(); }).catch(()=>{});
+  } else attachGyro();
+}
+function attachGyro(){
+  if(gyroHandler) return;
+  gyroHandler = e => {
+    if(!settings.gyro || !session.camera) return;
+    if(e.alpha !== null){
+      session.yaw = -(e.alpha * Math.PI) / 180;
+      session.pitch = Math.max(-1.4, Math.min(1.4, -(((e.beta || 0) - 90) * Math.PI / 180)));
+    }
+  };
+  window.addEventListener('deviceorientation', gyroHandler);
+}
+function disableGyro(){
+  if(gyroHandler){ window.removeEventListener('deviceorientation', gyroHandler); gyroHandler = null; }
+}
+
+/* ============ BOOT ============ */
+async function boot(){
+  await initSupabase();
+  $('#loading .label').textContent = 'جاهز';
+
+  // username
+  if(settings.username && settings.username.trim()){
+    session.username = settings.username;
+    showScreen('mainMenu');
+    setTimeout(startPreview, 50);
+  } else {
+    showScreen('usernameScreen');
+  }
+
+  // ===== Username screen =====
+  $('#uContinue').onclick = () => {
+    const v = $('#uInput').value.trim();
+    if(!v){ toast('أدخل اسماً', 'error'); return; }
+    session.username = v;
+    settings.username = v;
+    saveSettings();
+    showScreen('mainMenu');
+    startPreview();
+  };
+  $('#uInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#uContinue').click(); });
+
+  // ===== Main menu =====
+  $$('#mainMenu .menu-btn').forEach(btn => {
+    btn.onclick = () => {
+      const a = btn.dataset.action;
+      if(a === 'single') startGame('single');
+      else if(a === 'live'){
+        if(checkBan()) return;
+        if(!session.username){ showScreen('usernameScreen'); return; }
+        startGame('live');
+      }
+      else if(a === 'options') openOptions();
+      else if(a === 'operator') requestAdminAccess();
+    };
+  });
+
+  // ===== Options =====
+  $('#optBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
+  $('#optLang').onchange = e => {
+    settings.lang = e.target.value; saveSettings();
+    toast(settings.lang === 'ar' ? 'تم تغيير اللغة' : 'Language changed', 'success');
+  };
+  $('#optPov').oninput = e => {
+    settings.pov = +e.target.value; $('#optPovVal').textContent = settings.pov; saveSettings();
+    if(session.camera){ session.camera.fov = settings.pov; session.camera.updateProjectionMatrix(); }
+  };
+  $('#optGyro').onclick = () => {
+    settings.gyro = !settings.gyro;
+    $('#optGyro').classList.toggle('on', settings.gyro);
+    saveSettings();
+    if(settings.gyro) enableGyro(); else disableGyro();
+  };
+  $('#optCamPC').oninput = e => {
+    settings.camSpeedPC = +e.target.value;
+    $('#optCamPCVal').textContent = settings.camSpeedPC.toFixed(1) + 'x';
+    saveSettings();
+  };
+  $('#optCamMobile').oninput = e => {
+    settings.camSpeedMobile = +e.target.value;
+    $('#optCamMobileVal').textContent = settings.camSpeedMobile.toFixed(1) + 'x';
+    saveSettings();
+  };
+  $('#optReset').onclick = async () => {
+    const ok = await confirmDialog('إعادة تعيين', 'هل تريد إعادة تعيين كل الإعدادات؟', { yesLabel:'نعم', noLabel:'لا' });
+    if(ok){
+      const lang = settings.lang, username = settings.username;
+      settings = { ...DEFAULT_SETTINGS, lang, username };
+      saveSettings();
+      openOptions();
+      toast('تمت إعادة التعيين', 'success');
+    }
+  };
+
+  // ===== Chat =====
+  $('#chatClose').onclick = () => $('#chatPanel').classList.remove('open');
+  $('#chatSend').onclick = () => {
+    const v = $('#chatInput').value;
+    if(v.trim()){ sendChat(v); $('#chatInput').value = ''; }
+  };
+  $('#chatInput').addEventListener('keydown', e => { if(e.key === 'Enter') $('#chatSend').click(); });
+
+  // ===== Inventory =====
+  $('#invClose').onclick = () => $('#inventoryOverlay').classList.remove('active');
+
+  // ===== Admin lock =====
+  $$('#adminLock .pin-pad button').forEach(b => {
+    b.onclick = () => pinKeyPress(b.dataset.pin);
+  });
+  $('#lockExit').onclick = () => {
+    session.pinInput = '';
+    updatePinDisplay();
+    showScreen('mainMenu');
+    startPreview();
+  };
+
+  // ===== Operator =====
+  $('#opBack').onclick = () => { showScreen('mainMenu'); startPreview(); };
+
+  // ===== Ban screen =====
+  $('#banExit').onclick = () => { showScreen('mainMenu'); startPreview(); };
+
+  // ===== Resize =====
+  window.addEventListener('resize', () => {
+    if(session.mode === 'single' || session.mode === 'live') onGameResize();
+  });
+}
+
+boot().catch(err => {
+  console.error('Boot failed:', err);
+  showScreen('mainMenu');
+  setTimeout(startPreview, 100);
+});
 </script>
 </body>
 </html>
